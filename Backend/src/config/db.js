@@ -22,7 +22,7 @@ export const sequelize = new Sequelize(
 
     define: {
       freezeTableName: true,
-      underscored: true,
+      underscored: false,
       timestamps: true,
     },
 
