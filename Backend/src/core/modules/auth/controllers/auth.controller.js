@@ -22,5 +22,32 @@ export class AuthController {
             next(error);
         }
     };
+    
+    static async login(req, res, next) {
+        try {
+            const { email, password } = req.body;
 
+            const result = await AuthService.login(email, password);
+
+            if (!result.success) {
+                sendErrorResponse(res, result.message, STATUS.BAD_REQUEST);
+                return;
+            }
+
+            res.cookie('refreshToken', result.data.refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'Strict',
+                maxAge: 15 * 24 * 60 * 60 * 1000,
+            });
+
+            sendResponse(res, STATUS.OK, result.message, {
+                name: result.data.name,
+                email: result.data.email,
+                accessToken: result.data.accessToken,
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
 }

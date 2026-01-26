@@ -1,11 +1,12 @@
 import { STATUS } from "../../../constants/statusCodes.js";
 import AppError from "../../../utils/AppError.js";
 import User from "../models/user.model.js";
-import { hashPassword } from "../utils/hashPassword.util.js";
+import { hashPassword, comparePassword } from "../utils/hashPassword.util.js";
+import { generateToken, generateRefreshToken } from "../utils/token.util.js";
 
 
 export class AuthService {
-    static async signup (name, email, password) {
+    static async signup(name, email, password) {
         if (!name || !email || !password) {
             return {
                 success: false,
@@ -20,10 +21,10 @@ export class AuthService {
 
         const passwordHashed = await hashPassword(password);
 
-        const newUser = await User.create({ 
-            name, 
-            email, 
-            password: passwordHashed 
+        const newUser = await User.create({
+            name,
+            email,
+            password: passwordHashed
         });
 
         return {
@@ -35,6 +36,57 @@ export class AuthService {
                 email: newUser.email,
             },
         };
-    }
+    };
+
+    static async login(email, password) {
+        if (!email || !password) {
+            return {
+                success: false,
+                message: 'Email and password are required.',
+            };
+        }
+
+        const user = await User.findOne({ where: { email } });
+        if (!user || !user.isVerified) {
+            return {
+                success: false,
+                message: 'Invalid credentials or user not verified.',
+            };
+        }
+
+        const isPasswordValid = await comparePassword(password, user.password);
+        if (!isPasswordValid) {
+            return {
+                success: false,
+                message: 'Invalid email or password.',
+            };
+        }
+
+        const accessToken = generateToken({ 
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role, 
+            profilePic: user.profilePic
+        });
+        const refreshToken = generateRefreshToken({ 
+            id: user.id,
+            name: user.name, 
+            email: user.email,
+            role: user.role,
+            profilePic: user.profilePic
+        });
+
+        await user.update({ refreshToken });
+
+        return {
+            success: true,
+            message: 'Login successful.',
+            data: {
+                accessToken,
+                refreshToken,
+            },
+        };
+    };
 };
 

@@ -3,7 +3,7 @@ import env from "./env.js";
 import logger from "./logger.js";
 
 export const sequelize = new Sequelize(
-  env.DB_NAME,
+  process.env.DB_NAME,
   env.DB_USER,
   env.DB_PASSWORD,
   {
