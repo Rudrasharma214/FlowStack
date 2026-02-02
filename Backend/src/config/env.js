@@ -16,6 +16,9 @@ const env = {
     JWT_REFRESH_EXPIRES_IN: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
 
     EMAIL_VERIFY_SECRET: process.env.EMAIL_VERIFY_SECRET || 'your_email_verify_secret',
+
+    BREVO_API_KEY: process.env.BREVO_API_KEY || '',
+    BREVO_FROM_EMAIL: process.env.BREVO_FROM_EMAIL || ''
 };
 
 export default env;
