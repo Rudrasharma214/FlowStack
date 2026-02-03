@@ -48,7 +48,7 @@ export const connectDB = async () => {
 
 export const syncDB = async () => {
   try {
-    await sequelize.sync({ alter: true });
+    await sequelize.sync({ alter: false });
     logger.info("Database synced");
   } catch (err) {
     logger.error("Sync failed");
