@@ -1,8 +1,8 @@
-import { sequelize } from "../../../../config/db.js";
+import { sequelize } from "../../../../config/db";
 import { DataTypes } from "sequelize";
 
-const VerifyToken = sequelize.define(
-    'VerifyToken',
+const Subscription = sequelize.define(
+    'Subscription',
     {
         id: {
             type: DataTypes.INTEGER,
@@ -16,42 +16,52 @@ const VerifyToken = sequelize.define(
             allowNull: false,
         },
 
-        token: {
-            type: DataTypes.STRING,
+        plan_id: {
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
 
-        type: {
-            type: DataTypes.ENUM('email_verification', 'password_reset'),
-            allowNull: false,
-        },
-
-        expires_at: {
+        start_date: {
             type: DataTypes.DATE,
             allowNull: false,
         },
 
-        is_used: {
+        end_date: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        },
+
+        is_active: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
-            defaultValue: false,
+            defaultValue: true,
         },
 
-        used_at: {
+        cancelled_at: {
             type: DataTypes.DATE,
             allowNull: true,
-        }
+        },
+
+        renewed_at: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
+
+        billing_cycle: {
+            type: DataTypes.ENUM('monthly', 'yearly'),
+            allowNull: false,
+        },
     },
     {
-        tableName: 'verify_tokens',
+        tableName: 'subscriptions',
         paranoid: true,
-        createdAt: 'created_at',
-        updatedAt: 'updated_at',
         indexes: [
             { fields: ['user_id'] },
+            { fields: ['plan_id'] },
+            { fields: ['is_active'] },
             { fields: ['created_at'] },
         ],
     }
 );
 
-export default VerifyToken;
+export default Subscription;

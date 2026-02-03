@@ -50,6 +50,8 @@ const User = sequelize.define(
         tableName: 'users',
         paranoid: true,
         indexes: [
+            { fields: ['email'] },
+            { fields: ['role'] },
             { fields: ['created_at' ] },
         ],
     }

@@ -36,10 +36,10 @@ export class AuthService {
         const token = await generateEmailVerifyToken(user);
 
         await VerifyToken.create({
-            userId: user.id,
+            user_id: user.id,
             token,
             type: 'email_verification',
-            expiresAt: new Date(Date.now() + 2 * 60 * 60 * 1000),
+            expires_at: new Date(Date.now() + 2 * 60 * 60 * 1000),
         });
 
         const verifyLink = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
@@ -69,11 +69,11 @@ export class AuthService {
             const userId = await verifyEmailToken(token);
 
             const record = await VerifyToken.findOne(
-                { where: { userId } },
+                { where: { user_id: userId } },
                 { transaction }
             );
 
-            if (!record || record.expiresAt < new Date()) {
+            if (!record || record.expires_at < new Date() || record.is_used) {
                 return { success: false, message: "Invalid or expired token." };
             }
 
@@ -121,7 +121,7 @@ export class AuthService {
         const accessToken = generateToken(user.toJSON());
         const refreshToken = generateRefreshToken(user.toJSON());
 
-        await user.update({ refreshToken });
+        await user.update({ refreshToken, lastLoginAt: new Date() });
 
         return {
             success: true,
@@ -143,10 +143,10 @@ export class AuthService {
         const token = generateEmailVerifyToken({ id: user.id, type: 'password_reset' });
 
         await VerifyToken.create({
-            userId: user.id,
+            user_id: user.id,
             token,
             type: 'password_reset',
-            expiresAt: new Date(Date.now() + 1 * 60 * 60 * 1000),
+            expires_at: new Date(Date.now() + 1 * 60 * 60 * 1000),
         });
 
         const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
@@ -174,11 +174,11 @@ export class AuthService {
             const userId = await verifyEmailToken(token);
 
             const record = await VerifyToken.findOne(
-                { where: { userId } },
+                { where: { user_id: userId } },
                 { transaction }
             );
 
-            if (!record || record.expiresAt < new Date()) {
+            if (!record || record.expires_at < new Date() || record.is_used) {
                 await transaction.rollback();
                 return { success: false, message: "Invalid or expired token." };
             }
