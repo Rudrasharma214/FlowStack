@@ -6,53 +6,79 @@ export const emailLayout = ({ title, body }) => `
   <title>${title}</title>
 </head>
 
-<body style="margin:0;padding:0;background-color:#f2f2f2;">
+<body style="margin:0;padding:0;background:transparent;">
 
-<table width="100%" cellpadding="0" cellspacing="0" bgcolor="#f2f2f2">
+<table width="100%" cellpadding="0" cellspacing="0">
 <tr>
 <td align="center">
 
-<table width="600" cellpadding="0" cellspacing="0">
+<!-- MAIN CONTAINER -->
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:6px;overflow:hidden;">
 
-<!-- TOP BAR -->
+<!-- ================= HEADER ================= -->
 <tr>
-  <td height="140" bgcolor="#f6a545"></td>
-</tr>
-
-<!-- CARD -->
-<tr>
-<td align="center">
-
-<table width="520" cellpadding="0" cellspacing="0"
-style="background:#ffffff;margin-top:-90px;border-radius:6px;">
-
-<tr><td height="40"></td></tr>
-
-${body}
-
-<tr><td height="40"></td></tr>
-
-</table>
-
+<td bgcolor="#f6a545" align="center" style="padding:20px;">
+  <span style="
+    font-family:Arial,Helvetica,sans-serif;
+    font-size:22px;
+    font-weight:bold;
+    color:#ffffff;">
+    YOUR COMPANY NAME
+  </span>
 </td>
 </tr>
 
-<!-- FOOTER -->
+<!-- ================= BODY ================= -->
 <tr>
-<td align="center" style="padding-top:20px;">
+<td style="padding:40px 30px;">
+<table width="100%" cellpadding="0" cellspacing="0">
+${body}
+</table>
+</td>
+</tr>
+
+<!-- ================= FOOTER ================= -->
+<tr>
+<td align="center" style="padding:25px;">
+
+<table width="100%" cellpadding="0" cellspacing="0">
+
+<!-- DIVIDER -->
+<tr>
+<td align="center">
+<table width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td height="1" style="background:#dddddd;line-height:1px;font-size:1px;">
+&nbsp;
+</td>
+</tr>
+</table>
+</td>
+</tr>
+
+<tr><td height="16"></td></tr>
+
+<!-- COPYRIGHT -->
+<tr>
+<td align="center">
 <p style="
-margin:0;
-font-family:Arial,Helvetica,sans-serif;
-font-size:11px;
-color:#999999;">
-© ${new Date().getFullYear()} Your Company. All rights reserved.
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  font-size:12px;
+  color:#777777;">
+  © ${new Date().getFullYear()} Your Company Name. All rights reserved.
 </p>
 </td>
 </tr>
 
-<tr><td height="30"></td></tr>
+</table>
+
+</td>
+</tr>
+
 
 </table>
+<!-- END CONTAINER -->
 
 </td>
 </tr>
