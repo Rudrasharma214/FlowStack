@@ -5,20 +5,20 @@ import { sendPaymentFailedEmailTemplate } from "../../templates/paymentTemplates
 
 
 eventBus.on('payment.captured', async (data) => {
-    const { transactionId, planName, name, amount, startDate, endDate, billingCycle } = data;
+    const { email, transactionId, planName, name, amount, startDate, endDate, billingCycle } = data;
 
     await sendEmail({
-        to: data.userEmail,
+        to: email,
         subject: 'Payment Successful',
         html: sendPaymentSuccessEmailTemplate({ transactionId, planName, name, amount, startDate, endDate, billingCycle }),
     });
 });
 
 eventBus.on('payment.failed', async (data) => {
-    const { transactionId, planName, name } = data;
+    const { email, transactionId, planName, name } = data;
 
     await sendEmail({
-        to: data.userEmail,
+        to: email,
         subject: 'Payment Failed',
         html: sendPaymentFailedEmailTemplate({ transactionId, planName, name }),
     });
