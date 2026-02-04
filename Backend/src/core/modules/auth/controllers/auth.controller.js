@@ -7,6 +7,7 @@ export class AuthController {
     this.authService = authService;
     this.signup = this.signup.bind(this);
     this.login = this.login.bind(this);
+    this.verifyLoginOTP = this.verifyLoginOTP.bind(this);
     this.verifyEmail = this.verifyEmail.bind(this);
     this.forgotPassword = this.forgotPassword.bind(this);
     this.resetPassword = this.resetPassword.bind(this);
@@ -67,7 +68,7 @@ export class AuthController {
         return sendErrorResponse(res, result.statusCode, result.message, result.error);
       }
 
-      if(result.requiredOtp) {
+      if (result.requiredOtp) {
         return sendResponse(res, STATUS.OK, result.message, result.data);
       }
 
@@ -149,7 +150,7 @@ export class AuthController {
       const { id: userId } = req.user;
       const { oldPassword, newPassword } = req.body;
 
-      if(oldPassword === newPassword) {
+      if (oldPassword === newPassword) {
         return sendErrorResponse(res, STATUS.BAD_REQUEST, "New password must be different from old password.");
       }
 
@@ -169,7 +170,11 @@ export class AuthController {
   async refreshToken(req, res, next) {
     try {
       const userId = req.user.id;
-      const token = req.cookies.refreshToken;
+      const token = req.cookies?.refreshToken;
+
+      if (!token) {
+        return sendErrorResponse(res, STATUS.UNAUTHORIZED, "Refresh token not found. Please login again.");
+      }
 
       const result = await this.authService.refreshToken(userId, token);
 

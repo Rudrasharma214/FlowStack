@@ -71,7 +71,7 @@ export class AuthService {
             const userId = await verifyEmailToken(token);
 
             const record = await VerifyToken.findOne(
-                { where: { user_id: userId } },
+                { where: { user_id: userId, type: 'email_verification' } },
                 { transaction }
             );
 
@@ -92,6 +92,8 @@ export class AuthService {
             );
 
             await transaction.commit();
+
+            await record.destroy({ force: true });
 
             publishEvent(authNames.EMAIL_VERIFICATION, {
                 name: user.name,
@@ -143,9 +145,9 @@ export class AuthService {
                     success: true,
                     requiredOtp: true,
                     message: "OTP sent to your email. Please verify to complete login.",
-                    data: { 
+                    data: {
                         otpRequired: true,
-                        userId: user.id 
+                        userId: user.id
                     },
                 };
             }
@@ -193,6 +195,8 @@ export class AuthService {
 
             await user.update({ refreshToken, lastLoginAt: new Date() });
 
+            await otpRecord.destroy({ force: true });
+
             return {
                 success: true,
                 message: "OTP verified successfully. Login complete.",
@@ -227,7 +231,7 @@ export class AuthService {
 
             const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
 
-            publishEvent(authNames.FORGOT_PASSWORD, {
+            publishEvent(authNames.RESET_PASSWORD, {
                 name: user.name,
                 email: user.email,
                 resetLink,
@@ -254,7 +258,7 @@ export class AuthService {
             const userId = await verifyEmailToken(token);
 
             const record = await VerifyToken.findOne(
-                { where: { user_id: userId } },
+                { where: { user_id: userId, type: 'password_reset' } },
                 { transaction }
             );
 
@@ -275,6 +279,8 @@ export class AuthService {
             );
 
             await transaction.commit();
+
+            await record.destroy({ force: true });
 
             return {
                 success: true,

@@ -1,1 +1,1 @@
-import './models/association.js'
+import './subscription/models/association.js';

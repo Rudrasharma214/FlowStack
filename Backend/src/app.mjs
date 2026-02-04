@@ -1,4 +1,5 @@
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import { errorHandler } from './core/middlewares/error.middleware.js';
 import authRouter from './core/modules/auth/routes/auth.route.js';
 import { sendResponse } from './core/utils/response.js';
@@ -18,6 +19,8 @@ app.use(express.json({
     }
   }
 }));
+
+app.use(cookieParser());
 
 app.get('/', (req, res) => {
   sendResponse(res, STATUS.OK, 'Server is healthy', {
