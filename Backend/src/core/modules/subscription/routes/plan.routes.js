@@ -33,9 +33,15 @@ planRoutes.put('/:id', planController.updatePlan);
 
 /**
  * Route to deactivate a plan. Accessible only to admin users.
+ * Path: /api/subscription/plans/:id/deactivate
+ */
+planRoutes.patch('/:id/deactivate', planController.deactivatePlan);
+
+/**
+ * Route to delete a plan. Accessible only to admin users.
  * Path: /api/subscription/plans/:id
  */
-planRoutes.delete('/:id', planController.deactivatePlan);
+planRoutes.delete('/:id', planController.deletePlan);
 
 
 export default planRoutes;
