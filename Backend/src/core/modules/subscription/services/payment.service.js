@@ -44,13 +44,14 @@ export class PaymentService {
 
             const payment = await Payment.create({
                 subscription_id: subscriptionId,
+                plan_id: subscription.plan.id,
                 user_id: userId,
                 amount: order.amount / 100,
                 payment_date: new Date(),
                 payment_method: 'Razorpay',
                 gateway_order_id: order.id,
                 currency: order.currency,
-                status: order.status,
+                status: 'pending',
                 invoice_number: invoiceNumber,
             }, { transaction });
 

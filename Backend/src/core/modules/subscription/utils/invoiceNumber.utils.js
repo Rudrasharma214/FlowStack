@@ -1,4 +1,5 @@
 import { Op } from 'sequelize';
+import { sequelize } from "../../../../config/db.js";
 import Payment from '../models/payment.model.js';
 
 export async function generateInvoiceNumber({ transaction }) {
