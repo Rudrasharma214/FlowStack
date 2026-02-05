@@ -5,11 +5,12 @@ import { STATUS } from "../../../constants/statusCodes.js";
 import { createRazorpayOrder, verifyRazorpaySignature } from "../utils/payment.utils.js";
 import { sequelize } from "../../../../config/db.js";
 import { handlePaymentCaptured, handlePaymentFailed } from "./webhook.service.js";
-
+import { generateInvoiceNumber } from "../utils/invoiceNumber.utils.js";
 
 export class PaymentService {
     /* Create Payment Order */
     async createPaymentOrder(userId, subscriptionId) {
+        const transaction = await sequelize.transaction();
         try {
             const subscription = await Subscription.findOne({
                 where: { id: subscriptionId },
@@ -19,8 +20,11 @@ export class PaymentService {
                         as: "plan",
                     }
                 ],
-            });
+            },
+                { transaction }
+            );
             if (!subscription) {
+                await transaction.rollback();
                 return {
                     success: false,
                     message: "Subscription not found",
@@ -29,6 +33,8 @@ export class PaymentService {
             }
 
             const price = subscription.billing_cycle === 'monthly' ? subscription.plan.monthly_price : subscription.plan.yearly_price;
+
+            const invoiceNumber = await generateInvoiceNumber({ transaction });
 
             const order = await createRazorpayOrder(
                 price,
@@ -45,7 +51,10 @@ export class PaymentService {
                 gateway_order_id: order.id,
                 currency: order.currency,
                 status: order.status,
-            });
+                invoice_number: invoiceNumber,
+            }, { transaction });
+
+            await transaction.commit();
 
             return {
                 success: true,
@@ -53,7 +62,8 @@ export class PaymentService {
                 data: payment,
             };
         } catch (error) {
-            return {
+            await transaction.rollback();
+            return {                
                 success: false,
                 message: "Error creating payment order",
                 error: error.message,
