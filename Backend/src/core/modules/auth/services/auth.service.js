@@ -1,8 +1,8 @@
 import { STATUS } from "../../../constants/statusCodes.js";
 import AppError from "../../../utils/AppError.js";
-import User from "../models/user.model.js";
-import VerifyToken from "../models/verifyToken.model.js";
-import OTP from "../models/otp.model.js";
+import { UserRepository } from "../repositories/user.repositories.js";
+import { VerifyTokenRepository } from "../repositories/verifyToken.repositories.js";
+import { OtpRepository } from "../repositories/otp.repositories.js";
 import { hashPassword, comparePassword } from "../utils/hashPassword.util.js";
 import {
     generateToken,
@@ -14,19 +14,24 @@ import { publishEvent } from "../../../events/eventPublisher.js";
 import authNames from "../../../events/eventNames/authNames.js";
 import { sequelize } from "../../../../config/db.js";
 import { generateOTP } from "../utils/generateOTP.utils.js";
+import env from "../../../../config/env.js";
+
+const userRepository = new UserRepository();
+const verifyTokenRepository = new VerifyTokenRepository();
+const otpRepository = new OtpRepository();
 
 export class AuthService {
     /* Signup */
     async signup(name, email, password) {
         try {
-            const existingUser = await User.findOne({ where: { email } });
+            const existingUser = await userRepository.findByEmail(email);
             if (existingUser) {
                 throw new AppError("Email is already registered.", STATUS.CONFLICT);
             }
 
             const passwordHashed = await hashPassword(password);
 
-            const user = await User.create({
+            const user = await userRepository.createUser({
                 name,
                 email,
                 password: passwordHashed,
@@ -34,14 +39,14 @@ export class AuthService {
 
             const token = await generateEmailVerifyToken(user);
 
-            await VerifyToken.create({
-                user_id: user.id,
+            await verifyTokenRepository.createToken(
+                user.id,
                 token,
-                type: 'email_verification',
-                expires_at: new Date(Date.now() + 2 * 60 * 60 * 1000),
-            });
+                new Date(Date.now() + 2 * 60 * 60 * 1000),
+                'email_verification'
+            );
 
-            const verifyLink = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+            const verifyLink = `${env.FRONTEND_URL}/verify-email?token=${token}`;
 
             publishEvent(authNames.USER_SIGNUP, {
                 name: user.name,
@@ -70,18 +75,16 @@ export class AuthService {
         try {
             const userId = await verifyEmailToken(token);
 
-            const record = await VerifyToken.findOne(
-                { where: { user_id: userId, type: 'email_verification' } },
-                { transaction }
-            );
+            const record = await verifyTokenRepository.findByUserIdAndType(userId, 'email_verification');
 
-            if (!record || record.expires_at < new Date() || record.is_used) {
+            if (!record || record.expires_at < new Date()) {
+                await transaction.rollback();
                 return { success: false, message: "Invalid or expired token.", statusCode: STATUS.BAD_REQUEST };
             }
 
-            await record.update({ is_used: true }, { transaction });
-
-            const user = await User.findByPk(userId, { transaction });
+            await verifyTokenRepository.deleteTokenById(record.id);
+            
+            const user = await userRepository.findById(userId);
 
             const accessToken = generateToken(user.toJSON());
             const refreshToken = generateRefreshToken(user.toJSON());
@@ -92,8 +95,6 @@ export class AuthService {
             );
 
             await transaction.commit();
-
-            await record.destroy({ force: true });
 
             publishEvent(authNames.EMAIL_VERIFICATION, {
                 name: user.name,
@@ -114,7 +115,7 @@ export class AuthService {
     /* Login */
     async login(email, password) {
         try {
-            const user = await User.findOne({ where: { email } });
+            const user = await userRepository.findByEmail(email);
             if (!user || !user.isVerified) {
                 return { success: false, message: "Invalid credentials or user not verified.", statusCode: STATUS.UNAUTHORIZED };
             }
@@ -176,15 +177,12 @@ export class AuthService {
     /* VerifyLoginOTP */
     async verifyLoginOTP(userId, otp) {
         try {
-            const user = await User.findByPk(userId);
+            const user = await userRepository.findById(userId);
             if (!user) {
                 return { success: false, message: "User not found.", statusCode: STATUS.NOT_FOUND };
             }
 
-            const otpRecord = await OTP.findOne({
-                where: { user_id: userId, code: otp },
-                order: [['createdAt', 'DESC']],
-            });
+            const otpRecord = await otpRepository.findByUserIdAndCode(userId, otp);
 
             if (!otpRecord || otpRecord.expiresAt < new Date()) {
                 return { success: false, message: "Invalid or expired OTP.", statusCode: STATUS.BAD_REQUEST };
@@ -195,7 +193,7 @@ export class AuthService {
 
             await user.update({ refreshToken, lastLoginAt: new Date() });
 
-            await otpRecord.destroy({ force: true });
+            await otpRepository.deleteOtpById(otpRecord.id);
 
             return {
                 success: true,
@@ -215,21 +213,21 @@ export class AuthService {
     /* ForgotPassword */
     async forgotPassword(email) {
         try {
-            const user = await User.findOne({ where: { email } });
+            const user = await userRepository.findByEmail(email);
             if (!user) {
                 return { success: false, message: "If user exists, a password reset link will be sent to the email.", statusCode: STATUS.OK };
             }
 
             const token = generateEmailVerifyToken({ id: user.id, type: 'password_reset' });
 
-            await VerifyToken.create({
-                user_id: user.id,
+            await verifyTokenRepository.createToken(
+                user.id,
                 token,
-                type: 'password_reset',
-                expires_at: new Date(Date.now() + 1 * 60 * 60 * 1000),
-            });
+                new Date(Date.now() + 1 * 60 * 60 * 1000),
+                'password_reset'
+            );
 
-            const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+            const resetLink = `${env.FRONTEND_URL}/reset-password?token=${token}`;
 
             publishEvent(authNames.RESET_PASSWORD, {
                 name: user.name,
@@ -257,19 +255,16 @@ export class AuthService {
         try {
             const userId = await verifyEmailToken(token);
 
-            const record = await VerifyToken.findOne(
-                { where: { user_id: userId, type: 'password_reset' } },
-                { transaction }
-            );
+            const record = await verifyTokenRepository.findByUserIdAndType(userId, 'password_reset');
 
-            if (!record || record.expires_at < new Date() || record.is_used) {
+            if (!record || record.expires_at < new Date()) {
                 await transaction.rollback();
                 return { success: false, message: "Invalid or expired token.", statusCode: STATUS.BAD_REQUEST };
             }
 
-            await record.update({ is_used: true }, { transaction });
+            await verifyTokenRepository.deleteTokenById(record.id);
 
-            const user = await User.findByPk(userId, { transaction });
+            const user = await userRepository.findById(userId);
 
             const passwordHashed = await hashPassword(password);
 
@@ -279,8 +274,6 @@ export class AuthService {
             );
 
             await transaction.commit();
-
-            await record.destroy({ force: true });
 
             return {
                 success: true,
@@ -296,7 +289,7 @@ export class AuthService {
     /* ChangePassword */
     async changePassword(userId, oldPassword, newPassword) {
         try {
-            const user = await User.findByPk(userId);
+            const user = await userRepository.findById(userId);
             if (!user) {
                 return { success: false, message: "User not found.", statusCode: STATUS.NOT_FOUND };
             }
@@ -326,7 +319,7 @@ export class AuthService {
     /* RefreshToken */
     async refreshToken(userId, token) {
         try {
-            const user = await User.findByPk(userId);
+            const user = await userRepository.findById(userId);
             if (!user || user.refreshToken !== token) {
                 return { success: false, message: "Invalid refresh token.", statusCode: STATUS.UNAUTHORIZED };
             }
@@ -351,7 +344,7 @@ export class AuthService {
     /* Logout */
     async logout(userId) {
         try {
-            const user = await User.findByPk(userId);
+            const user = await userRepository.findById(userId);
             if (!user) {
                 return { success: false, message: "User not found.", statusCode: STATUS.NOT_FOUND };
             }
