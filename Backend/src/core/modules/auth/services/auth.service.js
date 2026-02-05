@@ -9,6 +9,7 @@ import {
     generateRefreshToken,
     generateEmailVerifyToken,
     verifyEmailToken,
+    verifyPasswordToken,
 } from "../utils/token.util.js";
 import { publishEvent } from "../../../events/eventPublisher.js";
 import authNames from "../../../events/eventNames/authNames.js";
@@ -23,9 +24,11 @@ const otpRepository = new OtpRepository();
 export class AuthService {
     /* Signup */
     async signup(name, email, password) {
+        const transaction = await sequelize.transaction();
         try {
-            const existingUser = await userRepository.findByEmail(email);
+            const existingUser = await userRepository.findByEmail(email, transaction);
             if (existingUser) {
+                await transaction.rollback();
                 throw new AppError("Email is already registered.", STATUS.CONFLICT);
             }
 
@@ -35,16 +38,19 @@ export class AuthService {
                 name,
                 email,
                 password: passwordHashed,
-            });
+            }, transaction);
 
-            const token = await generateEmailVerifyToken(user);
+            const token = await generateEmailVerifyToken({ id: user.id, type: 'email_verify' });
 
             await verifyTokenRepository.createToken(
                 user.id,
                 token,
                 new Date(Date.now() + 2 * 60 * 60 * 1000),
-                'email_verification'
+                'email_verification',
+                transaction
             );
+
+            await transaction.commit();
 
             const verifyLink = `${env.FRONTEND_URL}/verify-email?token=${token}`;
 
@@ -60,6 +66,7 @@ export class AuthService {
                 data: { id: user.id, name: user.name, email: user.email },
             };
         } catch (error) {
+            await transaction.rollback();
             return {
                 success: false,
                 message: "An error occurred during signup.",
@@ -75,16 +82,16 @@ export class AuthService {
         try {
             const userId = await verifyEmailToken(token);
 
-            const record = await verifyTokenRepository.findByUserIdAndType(userId, 'email_verification');
+            const record = await verifyTokenRepository.findByUserIdAndType(userId, 'email_verification', transaction);
 
             if (!record || record.expires_at < new Date()) {
                 await transaction.rollback();
                 return { success: false, message: "Invalid or expired token.", statusCode: STATUS.BAD_REQUEST };
             }
 
-            await verifyTokenRepository.deleteTokenById(record.id);
-            
-            const user = await userRepository.findById(userId);
+            await verifyTokenRepository.deleteTokenById(record.id, transaction);
+
+            const user = await userRepository.findById(userId, transaction);
 
             const accessToken = generateToken(user.toJSON());
             const refreshToken = generateRefreshToken(user.toJSON());
@@ -114,14 +121,17 @@ export class AuthService {
 
     /* Login */
     async login(email, password) {
+        const transaction = await sequelize.transaction();
         try {
-            const user = await userRepository.findByEmail(email);
+            const user = await userRepository.findByEmail(email, transaction);
             if (!user || !user.isVerified) {
+                await transaction.rollback();
                 return { success: false, message: "Invalid credentials or user not verified.", statusCode: STATUS.UNAUTHORIZED };
             }
 
             const isValid = await comparePassword(password, user.password);
             if (!isValid) {
+                await transaction.rollback();   
                 return { success: false, message: "Invalid email or password.", statusCode: STATUS.UNAUTHORIZED };
             }
 
@@ -130,7 +140,7 @@ export class AuthService {
             const daysSinceLastLogin = lastLogin ? Math.floor((currentDate - new Date(lastLogin)) / (1000 * 60 * 60 * 24)) : null;
 
             if (daysSinceLastLogin !== null && daysSinceLastLogin >= 15) {
-                const otpResult = await generateOTP(user.id);
+                const otpResult = await generateOTP(user.id, transaction);
 
                 if (!otpResult.success) {
                     return otpResult;
@@ -156,8 +166,8 @@ export class AuthService {
             const accessToken = generateToken(user.toJSON());
             const refreshToken = generateRefreshToken(user.toJSON());
 
-            await user.update({ refreshToken, lastLoginAt: new Date() });
-
+            await user.update({ refreshToken, lastLoginAt: new Date(), }, { transaction });
+            await transaction.commit();
             return {
                 success: true,
                 requiredOtp: false,
@@ -165,6 +175,7 @@ export class AuthService {
                 data: { accessToken, refreshToken },
             };
         } catch (error) {
+            await transaction.rollback();
             return {
                 success: false,
                 message: "An error occurred during login.",
@@ -176,24 +187,29 @@ export class AuthService {
 
     /* VerifyLoginOTP */
     async verifyLoginOTP(userId, otp) {
+        const transaction = await sequelize.transaction();
         try {
-            const user = await userRepository.findById(userId);
+            const user = await userRepository.findById(userId, transaction);
             if (!user) {
+                await transaction.rollback();
                 return { success: false, message: "User not found.", statusCode: STATUS.NOT_FOUND };
             }
 
-            const otpRecord = await otpRepository.findByUserIdAndCode(userId, otp);
+            const otpRecord = await otpRepository.findByUserIdAndCode(userId, otp, transaction);
 
             if (!otpRecord || otpRecord.expiresAt < new Date()) {
+                await transaction.rollback();
                 return { success: false, message: "Invalid or expired OTP.", statusCode: STATUS.BAD_REQUEST };
             }
 
             const accessToken = generateToken(user.toJSON());
             const refreshToken = generateRefreshToken(user.toJSON());
 
-            await user.update({ refreshToken, lastLoginAt: new Date() });
+            await user.update({ refreshToken, lastLoginAt: new Date() }, { transaction });
 
-            await otpRepository.deleteOtpById(otpRecord.id);
+            await otpRepository.deleteOtpById(otpRecord.id, transaction);
+
+            await transaction.commit();
 
             return {
                 success: true,
@@ -201,6 +217,7 @@ export class AuthService {
                 data: { accessToken, refreshToken },
             };
         } catch (error) {
+            await transaction.rollback();
             return {
                 success: false,
                 message: "An error occurred during OTP verification.",
@@ -212,9 +229,11 @@ export class AuthService {
 
     /* ForgotPassword */
     async forgotPassword(email) {
+        const transaction = await sequelize.transaction();
         try {
-            const user = await userRepository.findByEmail(email);
+            const user = await userRepository.findByEmail(email, transaction);
             if (!user) {
+                await transaction.rollback();
                 return { success: false, message: "If user exists, a password reset link will be sent to the email.", statusCode: STATUS.OK };
             }
 
@@ -224,7 +243,8 @@ export class AuthService {
                 user.id,
                 token,
                 new Date(Date.now() + 1 * 60 * 60 * 1000),
-                'password_reset'
+                'password_reset',
+                transaction
             );
 
             const resetLink = `${env.FRONTEND_URL}/reset-password?token=${token}`;
@@ -235,11 +255,14 @@ export class AuthService {
                 resetLink,
             });
 
+            await transaction.commit();
+
             return {
                 success: true,
                 message: "If user exists, a password reset link will be sent to the email.",
             }
         } catch (error) {
+            await transaction.rollback();
             return {
                 success: false,
                 message: "An error occurred during forgot password process.",
@@ -253,18 +276,18 @@ export class AuthService {
     async resetPassword(token, password) {
         const transaction = await sequelize.transaction();
         try {
-            const userId = await verifyEmailToken(token);
+            const userId = await verifyPasswordToken(token);
 
-            const record = await verifyTokenRepository.findByUserIdAndType(userId, 'password_reset');
+            const record = await verifyTokenRepository.findByUserIdAndType(userId, 'password_reset', transaction);
 
             if (!record || record.expires_at < new Date()) {
                 await transaction.rollback();
                 return { success: false, message: "Invalid or expired token.", statusCode: STATUS.BAD_REQUEST };
             }
 
-            await verifyTokenRepository.deleteTokenById(record.id);
+            await verifyTokenRepository.deleteTokenById(record.id, transaction);
 
-            const user = await userRepository.findById(userId);
+            const user = await userRepository.findById(userId, transaction);
 
             const passwordHashed = await hashPassword(password);
 

@@ -1,18 +1,19 @@
 import OTP from "../models/otp.model.js";
 import { STATUS } from "../../../constants/statusCodes.js";
 
-export const generateOTP = async (user_id) => {
+export const generateOTP = async (user_id, transaction = null) => {
     try {
         const otps = await OTP.findAll({
             where: { user_id },
             order: [['createdAt', 'DESC']],
+            transaction
         });
 
         const now = new Date();
         const count = otps.length;
 
         if (count === 0) {
-            return await generateNewOTP(user_id);
+            return await generateNewOTP(user_id, transaction);
         }
 
         const mostRecentOtp = otps[0];
@@ -20,7 +21,7 @@ export const generateOTP = async (user_id) => {
 
         if (count === 1) {
             if (timeSinceLastOtp >= 2) {
-                return await generateNewOTP(user_id);
+                return await generateNewOTP(user_id, transaction);
             } else {
                 return {
                     success: false,
@@ -32,7 +33,7 @@ export const generateOTP = async (user_id) => {
 
         if (count === 2) {
             if (timeSinceLastOtp >= 10) {
-                return await generateNewOTP(user_id);
+                return await generateNewOTP(user_id, transaction);
             } else {
                 return {
                     success: false,
@@ -44,7 +45,7 @@ export const generateOTP = async (user_id) => {
 
         if (count === 3) {
             if (timeSinceLastOtp >= 30) {
-                return await generateNewOTP(user_id);
+                return await generateNewOTP(user_id, transaction);
             } else {
                 return {
                     success: false,
@@ -59,7 +60,7 @@ export const generateOTP = async (user_id) => {
             const timeSinceThirdOtp = (now - new Date(thirdOtp.createdAt)) / (1000 * 60);
 
             if (timeSinceThirdOtp >= 60) {
-                return await generateNewOTP(user_id);
+                return await generateNewOTP(user_id, transaction);
             } else {
                 return {
                     success: false,
@@ -78,7 +79,7 @@ export const generateOTP = async (user_id) => {
     }
 };
 
-const generateNewOTP = async (user_id) => {
+const generateNewOTP = async (user_id, transaction = null) => {
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
@@ -86,7 +87,7 @@ const generateNewOTP = async (user_id) => {
         user_id,
         code: otpCode,
         expiresAt,
-    });
+    }, { transaction });
 
     return {
         success: true,
