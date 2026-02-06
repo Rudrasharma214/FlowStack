@@ -5,7 +5,7 @@ export const generateOTP = async (user_id, transaction = null) => {
     try {
         const otps = await OTP.findAll({
             where: { user_id },
-            order: [['createdAt', 'DESC']],
+            order: [['created_at', 'DESC']],
             transaction
         });
 
@@ -81,18 +81,18 @@ export const generateOTP = async (user_id, transaction = null) => {
 
 const generateNewOTP = async (user_id, transaction = null) => {
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+    const expires_at = new Date(Date.now() + 5 * 60 * 1000);
 
     await OTP.create({
         user_id,
         code: otpCode,
-        expiresAt,
+        expires_at,
     }, { transaction });
 
     return {
         success: true,
         message: "OTP generated successfully",
-        data: { otp: otpCode, expiresAt },
+        data: { otp: otpCode, expires_at },
         statusCode: STATUS.OK,
     };
 };

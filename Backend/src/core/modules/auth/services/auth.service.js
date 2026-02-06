@@ -97,7 +97,7 @@ export class AuthService {
             const refreshToken = generateRefreshToken(user.toJSON());
 
             await user.update(
-                { isVerified: true, refreshToken },
+                { isVerified: true, refreshToken, lastLoginAt: new Date() },
                 { transaction }
             );
 
@@ -143,8 +143,11 @@ export class AuthService {
                 const otpResult = await generateOTP(user.id, transaction);
 
                 if (!otpResult.success) {
+                    await transaction.rollback();
                     return otpResult;
                 }
+
+                await transaction.commit();
 
                 publishEvent(authNames.USER_LOGIN, {
                     name: user.name,
@@ -197,7 +200,7 @@ export class AuthService {
 
             const otpRecord = await otpRepository.findByUserIdAndCode(userId, otp, transaction);
 
-            if (!otpRecord || otpRecord.expiresAt < new Date()) {
+            if (!otpRecord || otpRecord.expires_at < new Date()) {
                 await transaction.rollback();
                 return { success: false, message: "Invalid or expired OTP.", statusCode: STATUS.BAD_REQUEST };
             }

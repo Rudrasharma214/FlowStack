@@ -3,11 +3,11 @@ import OTP from "../models/otp.model.js";
 export class OtpRepository {
 
     /* Create new OTP */
-    async createOtp(userId, code, expiresAt, transaction = null) {
+    async createOtp(userId, code, expires_at, transaction = null) {
         return await OTP.create({ 
             user_id: userId, 
             code, 
-            expiresAt 
+            expires_at 
         }, { transaction });
     }
 
@@ -26,8 +26,10 @@ export class OtpRepository {
         return await OTP.destroy({ 
             where: { 
                 id: otpId 
-            }
-        }, { transaction });
+            },
+            force: true,
+            transaction
+        });
     }
 
 };

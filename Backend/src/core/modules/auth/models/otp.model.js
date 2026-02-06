@@ -23,7 +23,7 @@ const OTP = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        expiresAt: {
+        expires_at: {
             type: DataTypes.DATE,
             allowNull: false,
         },
@@ -34,6 +34,7 @@ const OTP = sequelize.define(
         indexes: [
             { fields: ['user_id'] },
             { fields: ['created_at'] },
+            { fields: ['expires_at'] },
         ],
     }
 );
