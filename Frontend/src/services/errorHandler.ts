@@ -1,8 +1,8 @@
-import { logger } from './logger'
+import { logger } from './logger';
 
 export interface AppError {
-  message: string
-  status?: number
+  message: string;
+  status?: number;
 }
 
 /**
@@ -15,30 +15,30 @@ export function handleError(error: unknown, source?: string): AppError {
     const appError: AppError = {
       message: error.response?.data?.message || 'Something went wrong',
       status: error.response?.status,
-    }
+    };
 
-    logger.error(appError.message, error, source)
-    return appError
+    logger.error(appError.message, error, source);
+    return appError;
   }
 
   // Standard JS error
   if (error instanceof Error) {
-    logger.error(error.message, error, source)
-    return { message: error.message }
+    logger.error(error.message, error, source);
+    return { message: error.message };
   }
 
   // Fallback (unknown error)
-  logger.error('Unknown error', error, source)
-  return { message: 'Something went wrong' }
+  logger.error('Unknown error', error, source);
+  return { message: 'Something went wrong' };
 }
 
-function isHttpError(error: any): error is {
+function isHttpError(error: unknown): error is {
   response?: {
-    status?: number
+    status?: number;
     data?: {
-      message?: string
-    }
-  }
+      message?: string;
+    };
+  };
 } {
-  return typeof error === 'object' && error !== null && 'response' in error
+  return typeof error === 'object' && error !== null && 'response' in error;
 }

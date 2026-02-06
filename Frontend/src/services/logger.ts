@@ -1,23 +1,20 @@
-type LogLevel = 'debug' | 'info' | 'warn' | 'error'
+type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 interface LogPayload {
-  message: string
-  data?: unknown
-  source?: string
+  message: string;
+  data?: unknown;
+  source?: string;
 }
 
-const isDev = import.meta.env.MODE === 'development'
+const isDev = import.meta.env.MODE === 'development';
 
 function log(level: LogLevel, payload: LogPayload) {
-  if (!isDev && level === 'debug') return
+  if (!isDev && level === 'debug') return;
 
-  const prefix = `[${level.toUpperCase()}]`
-  const source = payload.source ? `[${payload.source}]` : ''
+  const prefix = `[${level.toUpperCase()}]`;
+  const source = payload.source ? `[${payload.source}]` : '';
 
-  console[level](
-    `${prefix}${source} ${payload.message}`,
-    payload.data ?? ''
-  )
+  console[level](`${prefix}${source} ${payload.message}`, payload.data ?? '');
 }
 
 export const logger = {
@@ -32,4 +29,4 @@ export const logger = {
 
   error: (message: string, data?: unknown, source?: string) =>
     log('error', { message, data, source }),
-}
+};
