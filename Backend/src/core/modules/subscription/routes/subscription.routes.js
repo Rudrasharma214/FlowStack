@@ -2,7 +2,7 @@ import express from 'express';
 import { SubscriptionController } from '../controllers/subscription.controller.js';
 import { SubscriptionService } from '../services/subscription.service.js';
 import { authenticate } from '../../auth/middlewares/auth.middleware.js';
-import { validate } from "../../../middlewares/validate.middleware.js";
+import { validate } from '../../../middlewares/validate.middleware.js';
 import { 
     subscriptionSchema
 } from '../validations/subscription.validation.js';

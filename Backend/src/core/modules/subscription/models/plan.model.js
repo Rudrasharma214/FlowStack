@@ -1,5 +1,5 @@
-import { sequelize } from "../../../../config/db.js";
-import { DataTypes } from "sequelize";
+import { sequelize } from '../../../../config/db.js';
+import { DataTypes } from 'sequelize';
 
 const Plan = sequelize.define(
     'Plan',
@@ -8,43 +8,43 @@ const Plan = sequelize.define(
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
-            allowNull: false,
+            allowNull: false
         },
 
         name: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: true,
+            unique: true
         },
 
         description: {
             type: DataTypes.TEXT,
-            allowNull: true,
+            allowNull: true
         },
 
         monthly_price: {
             type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
+            allowNull: false
         },
 
         yearly_price: {
             type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
+            allowNull: false
         },
 
         is_active: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
-            defaultValue: true,
-        },
+            defaultValue: true
+        }
     },
     {
         tableName: 'plans',
         paranoid: true,
         indexes: [
             { fields: ['name'] },
-            { fields: ['is_active'] },
-        ],
+            { fields: ['is_active'] }
+        ]
     }
 );
 

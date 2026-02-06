@@ -1,13 +1,13 @@
-import Subscription from "../models/subscription.model.js";
-import Plan from "../models/plan.model.js";
-import Payment from "../models/payment.model.js";
-import { STATUS } from "../../../constants/statusCodes.js";
-import { createRazorpayOrder, verifyRazorpaySignature } from "../utils/payment.utils.js";
-import { sequelize } from "../../../../config/db.js";
-import { handlePaymentCaptured, handlePaymentFailed } from "./webhook.service.js";
-import { generateInvoiceNumber } from "../utils/invoiceNumber.utils.js";
-import { PaymentRepository } from "../repositories/payment.repositories.js";
-import { SubscriptionRepository } from "../repositories/subscription.repositories.js";
+import Subscription from '../models/subscription.model.js';
+import Plan from '../models/plan.model.js';
+import Payment from '../models/payment.model.js';
+import { STATUS } from '../../../constants/statusCodes.js';
+import { createRazorpayOrder, verifyRazorpaySignature } from '../utils/payment.utils.js';
+import { sequelize } from '../../../../config/db.js';
+import { handlePaymentCaptured, handlePaymentFailed } from './webhook.service.js';
+import { generateInvoiceNumber } from '../utils/invoiceNumber.utils.js';
+import { PaymentRepository } from '../repositories/payment.repositories.js';
+import { SubscriptionRepository } from '../repositories/subscription.repositories.js';
 
 const paymentRepository = new PaymentRepository();
 const subscriptionRepository = new SubscriptionRepository();
@@ -21,18 +21,18 @@ export class PaymentService {
                 include: [
                     {
                         model: Plan,
-                        as: "plan",
+                        as: 'plan'
                     }
                 ],
-                transaction,
+                transaction
             });
             if (!subscription) {
                 await transaction.rollback();
                 return {
                     success: false,
-                    message: "Subscription not found",
-                    statusCode: STATUS.NOT_FOUND,
-                }
+                    message: 'Subscription not found',
+                    statusCode: STATUS.NOT_FOUND
+                };
             }
 
             const price = subscription.billing_cycle === 'monthly' ? subscription.plan.monthly_price : subscription.plan.yearly_price;
@@ -41,7 +41,7 @@ export class PaymentService {
 
             const order = await createRazorpayOrder(
                 price,
-                "INR",
+                'INR',
                 `receipt_${userId}_${subscriptionId}_${Date.now()}`
             );
             const paymentData = {
@@ -54,7 +54,7 @@ export class PaymentService {
                 gateway_order_id: order.id,
                 currency: order.currency,
                 status: 'pending',
-                invoice_number: invoiceNumber,
+                invoice_number: invoiceNumber
             };
             const payment = await paymentRepository.createPayment(paymentData, transaction);
 
@@ -62,17 +62,17 @@ export class PaymentService {
 
             return {
                 success: true,
-                message: "Payment order created successfully",
-                data: payment,
+                message: 'Payment order created successfully',
+                data: payment
             };
         } catch (error) {
             await transaction.rollback();
             return {                
                 success: false,
-                message: "Error creating payment order",
+                message: 'Error creating payment order',
                 error: error.message,
-                statusCode: STATUS.INTERNAL_ERROR,
-            }
+                statusCode: STATUS.INTERNAL_ERROR
+            };
         }
     };
 
@@ -85,8 +85,8 @@ export class PaymentService {
             if (!isValidSignature) {
                 return {
                     success: false,
-                    message: "Invalid webhook signature",
-                    statusCode: STATUS.UNAUTHORIZED,
+                    message: 'Invalid webhook signature',
+                    statusCode: STATUS.UNAUTHORIZED
                 };
             }
 
@@ -94,27 +94,27 @@ export class PaymentService {
             const eventType = event.event;
 
             switch (eventType) {
-                case 'payment.failed':
-                    return await handlePaymentFailed(event.payload.payment.entity, transaction);
+            case 'payment.failed':
+                return await handlePaymentFailed(event.payload.payment.entity, transaction);
 
-                case 'payment.captured':
-                    return await handlePaymentCaptured(event.payload.payment.entity, transaction);
+            case 'payment.captured':
+                return await handlePaymentCaptured(event.payload.payment.entity, transaction);
 
-                default:
-                    await transaction.commit();
-                    return {
-                        success: true,
-                        message: `Webhook event ${eventType} received`,
-                        statusCode: STATUS.OK,
-                    };
+            default:
+                await transaction.commit();
+                return {
+                    success: true,
+                    message: `Webhook event ${eventType} received`,
+                    statusCode: STATUS.OK
+                };
             }
         } catch (error) {
             await transaction.rollback();
             return {
                 success: false,
-                message: "Error processing webhook",
+                message: 'Error processing webhook',
                 error: error.message,
-                statusCode: STATUS.INTERNAL_ERROR,
+                statusCode: STATUS.INTERNAL_ERROR
             };
         }
     }

@@ -1,8 +1,8 @@
-import express from "express";
-import { AuthController } from "../controllers/auth.controller.js";
-import { AuthService } from "../services/auth.service.js";
-import { authenticate } from "../middlewares/auth.middleware.js";
-import { validate } from "../../../middlewares/validate.middleware.js";
+import express from 'express';
+import { AuthController } from '../controllers/auth.controller.js';
+import { AuthService } from '../services/auth.service.js';
+import { authenticate } from '../middlewares/auth.middleware.js';
+import { validate } from '../../../middlewares/validate.middleware.js';
 import { 
     changePasswordSchema,
     forgotPasswordSchema,
@@ -11,7 +11,7 @@ import {
     resetPasswordSchema, 
     verifyEmailSchema,
     verifyLoginOTPschema
-} from "../validations/user.schema.js";
+} from '../validations/user.schema.js';
 
 const authRouter = express.Router();
 
@@ -25,7 +25,7 @@ const authController = new AuthController(authService);
  * @access Public
  */
 authRouter.post(
-    "/signup", 
+    '/signup', 
     validate(registerSchema),
     authController.signup
 );
@@ -36,7 +36,7 @@ authRouter.post(
  * @access Public
  */
 authRouter.post(
-    "/verify-email", 
+    '/verify-email', 
     validate(verifyEmailSchema),
     authController.verifyEmail
 );
@@ -47,7 +47,7 @@ authRouter.post(
  * @access Public
  */
 authRouter.post(
-    "/login", 
+    '/login', 
     validate(loginSchema),
     authController.login
 );
@@ -58,10 +58,10 @@ authRouter.post(
  * @access Public
  */
 authRouter.post(
-    "/verify-login", 
+    '/verify-login', 
     validate(verifyLoginOTPschema),
     authController.verifyLoginOTP
-)
+);
 
 /** 
  * @route POST /auth/forgot-password
@@ -69,7 +69,7 @@ authRouter.post(
  * @access Public
  */
 authRouter.post(
-    "/forgot-password",
+    '/forgot-password',
     validate(forgotPasswordSchema),
     authController.forgotPassword
 );
@@ -80,7 +80,7 @@ authRouter.post(
  * @access Public
  */
 authRouter.post(
-    "/reset-password", 
+    '/reset-password', 
     validate(resetPasswordSchema),
     authController.resetPassword
 );
@@ -91,7 +91,7 @@ authRouter.post(
  * @access Private
  */
 authRouter.post(
-    "/change-password", 
+    '/change-password', 
     authenticate, 
     validate(changePasswordSchema),
     authController.changePassword
@@ -103,7 +103,7 @@ authRouter.post(
  * @access Private
  */
 authRouter.post(
-    "/refresh-token",
+    '/refresh-token',
     authController.refreshToken
 );
 
@@ -113,7 +113,7 @@ authRouter.post(
  * @access Private
  */
 authRouter.post(
-    "/logout", 
+    '/logout', 
     authenticate, 
     authController.logout
 );

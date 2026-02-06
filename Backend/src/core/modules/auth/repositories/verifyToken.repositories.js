@@ -1,4 +1,4 @@
-import VerifyToken from "../models/verifyToken.model.js";
+import VerifyToken from '../models/verifyToken.model.js';
 
 export class VerifyTokenRepository {
 

@@ -1,5 +1,5 @@
-import { STATUS } from "../../../constants/statusCodes.js";
-import { sendErrorResponse, sendResponse } from "../../../utils/response.js";
+import { STATUS } from '../../../constants/statusCodes.js';
+import { sendErrorResponse, sendResponse } from '../../../utils/response.js';
 
 export class PaymentController {
     constructor(paymentService) {
@@ -31,7 +31,7 @@ export class PaymentController {
             const webhookBody = req.rawBody;
 
             if (!signature || !webhookBody) {
-                return sendErrorResponse(res, STATUS.BAD_REQUEST, "Missing webhook signature or body");
+                return sendErrorResponse(res, STATUS.BAD_REQUEST, 'Missing webhook signature or body');
             }
 
             const result = await this.paymentService.handlePaymentWebhook(webhookBody, signature);

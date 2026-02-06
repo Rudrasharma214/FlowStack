@@ -8,25 +8,25 @@ const OTP = sequelize.define(
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
-            allowNull: false,
+            allowNull: false
         },
         user_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: "users",
-                key: "id",
+                model: 'users',
+                key: 'id'
             },
-            onDelete: "CASCADE",
+            onDelete: 'CASCADE'
         },
         code: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: false
         },
         expires_at: {
             type: DataTypes.DATE,
-            allowNull: false,
-        },
+            allowNull: false
+        }
     },
     {
         tableName: 'otps',
@@ -34,8 +34,8 @@ const OTP = sequelize.define(
         indexes: [
             { fields: ['user_id'] },
             { fields: ['created_at'] },
-            { fields: ['expires_at'] },
-        ],
+            { fields: ['expires_at'] }
+        ]
     }
 );
 

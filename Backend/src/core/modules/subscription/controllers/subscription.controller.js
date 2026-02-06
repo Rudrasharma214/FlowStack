@@ -1,5 +1,5 @@
-import { STATUS } from "../../../constants/statusCodes.js";
-import { sendErrorResponse, sendResponse } from "../../../utils/response.js";
+import { STATUS } from '../../../constants/statusCodes.js';
+import { sendErrorResponse, sendResponse } from '../../../utils/response.js';
 
 export class SubscriptionController {
     constructor(subscriptionService) {

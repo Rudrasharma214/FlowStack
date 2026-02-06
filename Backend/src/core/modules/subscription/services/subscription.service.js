@@ -1,6 +1,6 @@
-import { STATUS } from "../../../constants/statusCodes.js";
-import Plan from "../models/plan.model.js";
-import { SubscriptionRepository } from "../repositories/subscription.repositories.js";
+import { STATUS } from '../../../constants/statusCodes.js';
+import Plan from '../models/plan.model.js';
+import { SubscriptionRepository } from '../repositories/subscription.repositories.js';
 
 const subscriptionRepository = new SubscriptionRepository();
 export class SubscriptionService {
@@ -15,23 +15,23 @@ export class SubscriptionService {
                 billing_cycle: subscriptionData.billing_cycle,
                 auto_renew: subscriptionData.auto_renew,
                 renewed_at: subscriptionData.renewed_at,
-                status: 'inactive',
-            }
+                status: 'inactive'
+            };
             const newSubscription = await subscriptionRepository.createSubscription(data);
 
             return {
                 success: true,
-                message: "Subscription created successfully",
-                data: newSubscription,
+                message: 'Subscription created successfully',
+                data: newSubscription
             };
 
         } catch (error) {
             return {
                 success: false,
-                message: "Error creating subscription",
+                message: 'Error creating subscription',
                 error: error.message,
-                statusCode: STATUS.INTERNAL_ERROR,
-            }
+                statusCode: STATUS.INTERNAL_ERROR
+            };
         }
     };
 
@@ -64,24 +64,24 @@ export class SubscriptionService {
             if (!subscription) {
                 return {
                     success: false,
-                    message: "No subscription found for this user",
-                    statusCode: STATUS.NOT_FOUND,
+                    message: 'No subscription found for this user',
+                    statusCode: STATUS.NOT_FOUND
                 };
             }
 
             return {
                 success: true,
-                message: "Subscription retrieved successfully",
-                data: subscription,
+                message: 'Subscription retrieved successfully',
+                data: subscription
             };
 
         } catch (error) {
             return {
                 success: false,
-                message: "Error retrieving subscription",
+                message: 'Error retrieving subscription',
                 error: error.message,
-                statusCode: STATUS.INTERNAL_ERROR,
-            }
+                statusCode: STATUS.INTERNAL_ERROR
+            };
         }
     };
 };

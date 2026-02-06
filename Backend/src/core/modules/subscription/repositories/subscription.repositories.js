@@ -1,4 +1,4 @@
-import Subscription from "../models/subscription.model.js";
+import Subscription from '../models/subscription.model.js';
 
 export class SubscriptionRepository {
 

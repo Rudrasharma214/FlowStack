@@ -1,4 +1,4 @@
-import OTP from "../models/otp.model.js";
+import OTP from '../models/otp.model.js';
 
 export class OtpRepository {
 

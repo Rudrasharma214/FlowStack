@@ -1,5 +1,5 @@
-import { STATUS } from "../../../constants/statusCodes.js";
-import { sendErrorResponse, sendResponse } from "../../../utils/response.js";
+import { STATUS } from '../../../constants/statusCodes.js';
+import { sendErrorResponse, sendResponse } from '../../../utils/response.js';
 
 export class PlanController {
     constructor(planService) {
@@ -69,7 +69,7 @@ export class PlanController {
             const planData = req.body;
 
             if (!id) {
-                return sendErrorResponse(res, STATUS.BAD_REQUEST, "Plan ID is required", null);
+                return sendErrorResponse(res, STATUS.BAD_REQUEST, 'Plan ID is required', null);
             }
 
             const updatedPlan = await this.planService.updatePlan(id, planData);
@@ -89,7 +89,7 @@ export class PlanController {
         try {
             const { id } = req.params;
             if (!id) {
-                return sendErrorResponse(res, STATUS.BAD_REQUEST, "Plan ID is required", null);
+                return sendErrorResponse(res, STATUS.BAD_REQUEST, 'Plan ID is required', null);
             }
 
             const deletedPlan = await this.planService.deletePlan(id);

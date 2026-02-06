@@ -3,7 +3,7 @@ const authNames = {
     USER_LOGIN: 'user_login',
     EMAIL_VERIFICATION: 'email_verification',
     RESET_PASSWORD: 'reset_password',
-    SUCCESSFUL_PASSWORD_RESET: 'successful_password_reset',
+    SUCCESSFUL_PASSWORD_RESET: 'successful_password_reset'
 };
 
 export default authNames;

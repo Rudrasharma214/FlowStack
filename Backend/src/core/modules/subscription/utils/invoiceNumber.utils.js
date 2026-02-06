@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import { sequelize } from "../../../../config/db.js";
+import { sequelize } from '../../../../config/db.js';
 import Payment from '../models/payment.model.js';
 
 export async function generateInvoiceNumber({ transaction }) {
@@ -10,11 +10,11 @@ export async function generateInvoiceNumber({ transaction }) {
     const lastRecord = await Payment.findOne({
         attributes: ['invoice_number'],
         where: {
-            invoice_number: { [Op.like]: `${prefix}%` },
+            invoice_number: { [Op.like]: `${prefix}%` }
         },
         order: [[sequelize.literal(`CAST(SUBSTRING(invoice_number, ${prefix.length + 1}) AS UNSIGNED)`), 'DESC']],
         transaction,
-        lock: transaction.LOCK.UPDATE,
+        lock: transaction.LOCK.UPDATE
     });
 
     let nextNumber = 1;

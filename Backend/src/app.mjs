@@ -29,25 +29,25 @@ app.use(express.urlencoded({ extended: true }));
 
 // Store raw body for webhook signature verification
 app.use(express.json({
-  verify: (req, res, buf, encoding) => {
-    if (req.path.includes('/webhook')) {
-      req.rawBody = buf.toString(encoding || 'utf8');
+    verify: (req, res, buf, encoding) => {
+        if (req.path.includes('/webhook')) {
+            req.rawBody = buf.toString(encoding || 'utf8');
+        }
     }
-  }
 }));
 
 app.use(cookieParser());
 
 app.get('/', (req, res) => {
-  sendResponse(res, STATUS.OK, 'Server is healthy', {
-    version: 'TMS-1.0',
-    ip: req.ip,
-    healthy: true,
-    requestedAt: new Date().toLocaleString("en-IN", {
-      timeZone: "Asia/Kolkata",
-      hour12: false
-    }),
-  });
+    sendResponse(res, STATUS.OK, 'Server is healthy', {
+        version: 'TMS-1.0',
+        ip: req.ip,
+        healthy: true,
+        requestedAt: new Date().toLocaleString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            hour12: false
+        })
+    });
 });
 
 app.use('/api/auth', authRouter);

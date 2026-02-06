@@ -8,43 +8,43 @@ const User = sequelize.define(
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
-            allowNull: false,
+            allowNull: false
         },
         name: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: false
         },
         email: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: true,
+            unique: true
         },
         password: {
             type: DataTypes.STRING,
-            allowNull: true,
+            allowNull: true
         },
         profilePic: {
             type: DataTypes.STRING,
-            allowNull: true,
+            allowNull: true
         },
         role: {
             type: DataTypes.ENUM('admin', 'user'),
             allowNull: false,
-            defaultValue: 'user',
+            defaultValue: 'user'
         },
         refreshToken: {
             type: DataTypes.TEXT,
-            allowNull: true,
+            allowNull: true
         },
         isVerified: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
-            defaultValue: false,
+            defaultValue: false
         },
         lastLoginAt: {
             type: DataTypes.DATE,
-            allowNull: true,
-        },
+            allowNull: true
+        }
     },
     {
         tableName: 'users',
@@ -52,8 +52,8 @@ const User = sequelize.define(
         indexes: [
             { fields: ['email'] },
             { fields: ['role'] },
-            { fields: ['created_at' ] },
-        ],
+            { fields: ['created_at' ] }
+        ]
     }
 );
 

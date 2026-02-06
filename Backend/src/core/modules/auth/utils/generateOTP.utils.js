@@ -1,5 +1,5 @@
-import OTP from "../models/otp.model.js";
-import { STATUS } from "../../../constants/statusCodes.js";
+import OTP from '../models/otp.model.js';
+import { STATUS } from '../../../constants/statusCodes.js';
 
 export const generateOTP = async (user_id, transaction = null) => {
     try {
@@ -26,7 +26,7 @@ export const generateOTP = async (user_id, transaction = null) => {
                 return {
                     success: false,
                     message: `Please wait ${Math.ceil(2 - timeSinceLastOtp)} minute(s) before requesting a new OTP.`,
-                    statusCode: STATUS.TOO_MANY_REQUESTS,
+                    statusCode: STATUS.TOO_MANY_REQUESTS
                 };
             }
         }
@@ -38,7 +38,7 @@ export const generateOTP = async (user_id, transaction = null) => {
                 return {
                     success: false,
                     message: `Please wait ${Math.ceil(10 - timeSinceLastOtp)} minute(s) before requesting a new OTP.`,
-                    statusCode: STATUS.TOO_MANY_REQUESTS,
+                    statusCode: STATUS.TOO_MANY_REQUESTS
                 };
             }
         }
@@ -50,7 +50,7 @@ export const generateOTP = async (user_id, transaction = null) => {
                 return {
                     success: false,
                     message: `Please wait ${Math.ceil(30 - timeSinceLastOtp)} minute(s) before requesting a new OTP.`,
-                    statusCode: STATUS.TOO_MANY_REQUESTS,
+                    statusCode: STATUS.TOO_MANY_REQUESTS
                 };
             }
         }
@@ -65,16 +65,16 @@ export const generateOTP = async (user_id, transaction = null) => {
                 return {
                     success: false,
                     message: `Too many OTP requests. Please try again in ${Math.ceil(60 - timeSinceThirdOtp)} minute(s).`,
-                    statusCode: STATUS.TOO_MANY_REQUESTS,
+                    statusCode: STATUS.TOO_MANY_REQUESTS
                 };
             }
         }
     } catch (error) {
         return {
             success: false,
-            message: "Error generating OTP",
+            message: 'Error generating OTP',
             error: error.message,
-            statusCode: STATUS.INTERNAL_ERROR,
+            statusCode: STATUS.INTERNAL_ERROR
         };
     }
 };
@@ -86,13 +86,13 @@ const generateNewOTP = async (user_id, transaction = null) => {
     await OTP.create({
         user_id,
         code: otpCode,
-        expires_at,
+        expires_at
     }, { transaction });
 
     return {
         success: true,
-        message: "OTP generated successfully",
+        message: 'OTP generated successfully',
         data: { otp: otpCode, expires_at },
-        statusCode: STATUS.OK,
+        statusCode: STATUS.OK
     };
 };

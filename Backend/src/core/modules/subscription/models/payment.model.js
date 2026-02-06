@@ -1,5 +1,5 @@
-import { sequelize } from "../../../../config/db.js";
-import { DataTypes } from "sequelize";
+import { sequelize } from '../../../../config/db.js';
+import { DataTypes } from 'sequelize';
 
 const Payment = sequelize.define(
     'Payment',
@@ -8,86 +8,86 @@ const Payment = sequelize.define(
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
-            allowNull: false,
+            allowNull: false
         },
 
         subscription_id: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: false
         },
 
         plan_id: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: false
         },
 
         user_id: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: false
         },
 
         amount: {
             type: DataTypes.DECIMAL(10, 2),
-            allowNull: false,
+            allowNull: false
         },
 
         payment_date: {
             type: DataTypes.DATE,
-            allowNull: false,
+            allowNull: false
         },
 
         payment_method: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: false
         },
 
         gateway_order_id: {
             type: DataTypes.STRING,
-            allowNull: true,
+            allowNull: true
         },
 
         gateway_payment_id: {
             type: DataTypes.STRING,
-            allowNull: true,
+            allowNull: true
         },
 
         gateway_signature: {
             type: DataTypes.STRING,
-            allowNull: true,
+            allowNull: true
         },
 
         currency: {
             type: DataTypes.STRING,
             allowNull: false,
-            defaultValue: 'INR',
+            defaultValue: 'INR'
         },
 
         refund_reason: {
             type: DataTypes.TEXT,
-            allowNull: true,
+            allowNull: true
         },
 
         status: {
             type: DataTypes.ENUM('pending', 'captured', 'completed', 'failed', 'refunded'),
             allowNull: false,
-            defaultValue: 'pending',
+            defaultValue: 'pending'
         },
 
         invoice_number: {
             type: DataTypes.STRING,
-            allowNull: true,
+            allowNull: true
         },
 
         invoice_url: {
             type: DataTypes.STRING,
-            allowNull: true,
-        },
+            allowNull: true
+        }
     },
     {
         tableName: 'payments',
         paranoid: true,
         indexes: [
-        ],
+        ]
     }
 );
 

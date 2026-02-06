@@ -1,4 +1,4 @@
-import Plan from "../models/plan.model.js";
+import Plan from '../models/plan.model.js';
 
 export class PlanRepository {
 

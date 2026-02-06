@@ -1,8 +1,8 @@
-import Payment from "../models/payment.model.js";
-import Subscription from "../models/subscription.model.js";
-import { publishEvent } from "../../../events/eventPublisher.js";
-import paymentNames from "../../../events/eventNames/paymentNames.js";
-import { PaymentRepository } from "../repositories/payment.repositories.js";
+import Payment from '../models/payment.model.js';
+import Subscription from '../models/subscription.model.js';
+import { publishEvent } from '../../../events/eventPublisher.js';
+import paymentNames from '../../../events/eventNames/paymentNames.js';
+import { PaymentRepository } from '../repositories/payment.repositories.js';
 
 const paymentRepository = new PaymentRepository();
 
@@ -17,8 +17,8 @@ export const handlePaymentCaptured = async (paymentData, transaction) => {
         if (!payment) {
             return {
                 success: false,
-                message: "Payment not found",
-                statusCode: STATUS.NOT_FOUND,
+                message: 'Payment not found',
+                statusCode: STATUS.NOT_FOUND
             };
         }
 
@@ -26,7 +26,7 @@ export const handlePaymentCaptured = async (paymentData, transaction) => {
             {
                 status: 'captured',
                 gateway_payment_id: paymentData.id,
-                payment_date: new Date(paymentData.created_at * 1000),
+                payment_date: new Date(paymentData.created_at * 1000)
             },
             { transaction }
         );
@@ -43,21 +43,21 @@ export const handlePaymentCaptured = async (paymentData, transaction) => {
             paymentId: payment.id,
             subscriptionId: payment.subscription_id,
             userId: payment.user_id,
-            amount: payment.amount,
+            amount: payment.amount
         });
 
         await transaction.commit();
 
         return {
             success: true,
-            message: "Payment captured successfully",
-            statusCode: STATUS.OK,
+            message: 'Payment captured successfully',
+            statusCode: STATUS.OK
         };
     } catch (error) {
         await transaction.rollback();
         throw error;
     }
-}
+};
 
 /* Handle Payment Failed */
 export const handlePaymentFailed = async (paymentData, transaction) => {
@@ -70,15 +70,15 @@ export const handlePaymentFailed = async (paymentData, transaction) => {
         if (!payment) {
             return {
                 success: false,
-                message: "Payment not found",
-                statusCode: STATUS.NOT_FOUND,
+                message: 'Payment not found',
+                statusCode: STATUS.NOT_FOUND
             };
         }
 
         await payment.update(
             {
                 status: 'failed',
-                gateway_payment_id: paymentData.id,
+                gateway_payment_id: paymentData.id
             },
             { transaction }
         );
@@ -87,15 +87,15 @@ export const handlePaymentFailed = async (paymentData, transaction) => {
             paymentId: payment.id,
             subscriptionId: payment.subscription_id,
             userId: payment.user_id,
-            reason: paymentData.error_description || 'Payment failed',
+            reason: paymentData.error_description || 'Payment failed'
         });
 
         await transaction.commit();
 
         return {
             success: true,
-            message: "Payment failure recorded",
-            statusCode: STATUS.OK,
+            message: 'Payment failure recorded',
+            statusCode: STATUS.OK
         };
     } catch (error) {
         await transaction.rollback();

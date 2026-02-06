@@ -1,5 +1,5 @@
-import { sequelize } from "../../../../config/db.js";
-import { DataTypes } from "sequelize";
+import { sequelize } from '../../../../config/db.js';
+import { DataTypes } from 'sequelize';
 
 const Subscription = sequelize.define(
     'Subscription',
@@ -8,60 +8,60 @@ const Subscription = sequelize.define(
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
-            allowNull: false,
+            allowNull: false
         },
 
         user_id: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: false
         },
 
         plan_id: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: false
         },
 
         start_date: {
             type: DataTypes.DATE,
-            allowNull: false,
+            allowNull: false
         },
 
         end_date: {
             type: DataTypes.DATE,
-            allowNull: false,
+            allowNull: false
         },
 
         is_active: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
-            defaultValue: true,
+            defaultValue: true
         },
 
         cancelled_at: {
             type: DataTypes.DATE,
-            allowNull: true,
+            allowNull: true
         },
 
         auto_renew: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
-            defaultValue: true,
+            defaultValue: true
         },
 
         renewed_at: {
             type: DataTypes.DATE,
-            allowNull: true,
+            allowNull: true
         },
 
         billing_cycle: {
             type: DataTypes.ENUM('monthly', 'yearly'),
-            allowNull: false,
+            allowNull: false
         },
 
         status: {
             type: DataTypes.ENUM('active', 'inactive', 'cancelled', 'expired', 'paused'),
             allowNull: false,
-            defaultValue: 'inactive',
+            defaultValue: 'inactive'
         }
     },
     {
@@ -71,8 +71,8 @@ const Subscription = sequelize.define(
             { fields: ['user_id'] },
             { fields: ['plan_id'] },
             { fields: ['is_active'] },
-            { fields: ['created_at'] },
-        ],
+            { fields: ['created_at'] }
+        ]
     }
 );
 

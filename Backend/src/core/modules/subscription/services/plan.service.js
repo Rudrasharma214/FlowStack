@@ -1,7 +1,7 @@
-import { STATUS } from "../../../constants/statusCodes.js";
-import { Op } from "sequelize";
-import Plan from "../models/plan.model.js";
-import { PlanRepository } from "../repositories/plan.repositories.js";
+import { STATUS } from '../../../constants/statusCodes.js';
+import { Op } from 'sequelize';
+import Plan from '../models/plan.model.js';
+import { PlanRepository } from '../repositories/plan.repositories.js';
 
 const planRepository = new PlanRepository();
 
@@ -24,23 +24,23 @@ export class PlanService {
                 return {
                     success: false,
                     statusCode: STATUS.NOT_FOUND,
-                    message: "No plans found",
+                    message: 'No plans found',
                     errors: null
                 };
             }
 
             return {
                 success: true,
-                message: "Plans retrieved successfully",
+                message: 'Plans retrieved successfully',
                 data: plans
             };
         } catch (error) {
             return {
                 success: false,
                 statusCode: STATUS.INTERNAL_ERROR,
-                message: "An error occurred while retrieving plans",
+                message: 'An error occurred while retrieving plans',
                 errors: error.message
-            }
+            };
         }
     }
 
@@ -62,23 +62,23 @@ export class PlanService {
                 return {
                     success: false,
                     statusCode: STATUS.NOT_FOUND,
-                    message: "No plans found",
+                    message: 'No plans found',
                     errors: null
                 };
             }
 
             return {
                 success: true,
-                message: "Plans retrieved successfully",
+                message: 'Plans retrieved successfully',
                 data: plans
             };
         } catch (error) {
             return {
                 success: false,
                 statusCode: STATUS.INTERNAL_ERROR,
-                message: "An error occurred while retrieving plans",
+                message: 'An error occurred while retrieving plans',
                 errors: error.message
-            }
+            };
         }
     };
 
@@ -89,7 +89,7 @@ export class PlanService {
 
             return {
                 success: true,
-                message: "Plan created successfully",
+                message: 'Plan created successfully',
                 data: newPlan
             };
 
@@ -97,9 +97,9 @@ export class PlanService {
             return {
                 success: false,
                 statusCode: STATUS.INTERNAL_ERROR,
-                message: "An error occurred while creating the plan",
+                message: 'An error occurred while creating the plan',
                 errors: error.message
-            }
+            };
         }
     };
 
@@ -112,7 +112,7 @@ export class PlanService {
                 return {
                     success: false,
                     statusCode: STATUS.NOT_FOUND,
-                    message: "Plan not found",
+                    message: 'Plan not found',
                     errors: null
                 };
             }
@@ -121,16 +121,16 @@ export class PlanService {
 
             return {
                 success: true,
-                message: "Plan updated successfully",
+                message: 'Plan updated successfully',
                 data: plan
             };
         } catch (error) {
             return {
                 success: false,
                 statusCode: STATUS.INTERNAL_ERROR,
-                message: "An error occurred while updating the plan",
+                message: 'An error occurred while updating the plan',
                 errors: error.message
-            }
+            };
         }
     };
 
@@ -143,7 +143,7 @@ export class PlanService {
                 return {
                     success: false,
                     statusCode: STATUS.NOT_FOUND,
-                    message: "Plan not found",
+                    message: 'Plan not found',
                     errors: null
                 };
             }
@@ -152,16 +152,16 @@ export class PlanService {
 
             return {
                 success: true,
-                message: "Plan deleted successfully",
+                message: 'Plan deleted successfully',
                 data: plan
             };
         } catch (error) {
             return {
                 success: false,
                 statusCode: STATUS.INTERNAL_ERROR,
-                message: "An error occurred while deleting the plan",
+                message: 'An error occurred while deleting the plan',
                 errors: error.message
-            }
+            };
         }
     };
 }

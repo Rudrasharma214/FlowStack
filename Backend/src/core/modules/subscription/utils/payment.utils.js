@@ -1,8 +1,8 @@
-import Razorpay from "razorpay";
-import env from "../../../../config/env.js";
-import AppError from "../../../utils/AppError.js";
-import { STATUS } from "../../../constants/statusCodes.js";
-import crypto from "crypto";
+import Razorpay from 'razorpay';
+import env from '../../../../config/env.js';
+import AppError from '../../../utils/AppError.js';
+import { STATUS } from '../../../constants/statusCodes.js';
+import crypto from 'crypto';
 
 
 /**
@@ -12,19 +12,19 @@ import crypto from "crypto";
 let razorpayInstance = null;
 
 export const initializeRazorpay = () => {
-  const keyId = env.RAZORPAY_KEY_ID;
-  const keySecret = env.RAZORPAY_KEY_SECRET;
+    const keyId = env.RAZORPAY_KEY_ID;
+    const keySecret = env.RAZORPAY_KEY_SECRET;
 
-  if (!keyId || !keySecret) {
-    throw new AppError('Razorpay credentials not configured', STATUS.INTERNAL_ERROR);
-  }
+    if (!keyId || !keySecret) {
+        throw new AppError('Razorpay credentials not configured', STATUS.INTERNAL_ERROR);
+    }
 
-  razorpayInstance = new Razorpay({
-    key_id: keyId,
-    key_secret: keySecret,
-  });
+    razorpayInstance = new Razorpay({
+        key_id: keyId,
+        key_secret: keySecret
+    });
 
-  return razorpayInstance;
+    return razorpayInstance;
 };
 
 /**
@@ -39,7 +39,7 @@ export const createRazorpayOrder = async (amount, currency, receipt) => {
         const order = await razorpay.orders.create({
             amount: amountInPaise,
             currency,
-            receipt,
+            receipt
         });
 
         return {
@@ -48,8 +48,8 @@ export const createRazorpayOrder = async (amount, currency, receipt) => {
             currency: order.currency,
             receipt: order.receipt,
             status: order.status,
-            created_at: order.created_at,
-        }
+            created_at: order.created_at
+        };
     } catch (error) {
         throw new AppError('Failed to create Razorpay order', STATUS.INTERNAL_ERROR);
     }

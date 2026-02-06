@@ -1,5 +1,5 @@
-import { sequelize } from "../../../../config/db.js";
-import { DataTypes } from "sequelize";
+import { sequelize } from '../../../../config/db.js';
+import { DataTypes } from 'sequelize';
 
 const VerifyToken = sequelize.define(
     'VerifyToken',
@@ -8,28 +8,28 @@ const VerifyToken = sequelize.define(
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
-            allowNull: false,
+            allowNull: false
         },
 
         user_id: {
             type: DataTypes.INTEGER,
-            allowNull: false,
+            allowNull: false
         },
 
         token: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: false
         },
 
         type: {
             type: DataTypes.ENUM('email_verification', 'password_reset'),
-            allowNull: false,
+            allowNull: false
         },
 
         expires_at: {
             type: DataTypes.DATE,
-            allowNull: false,
-        },
+            allowNull: false
+        }
     },
     {
         tableName: 'verify_tokens',
@@ -38,8 +38,8 @@ const VerifyToken = sequelize.define(
         updatedAt: 'updated_at',
         indexes: [
             { fields: ['user_id'] },
-            { fields: ['created_at'] },
-        ],
+            { fields: ['created_at'] }
+        ]
     }
 );
 
