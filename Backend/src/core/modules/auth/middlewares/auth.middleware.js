@@ -18,7 +18,7 @@ export const authenticate = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (error) {
-        return sendErrorResponse(res, STATUS.UNAUTHORIZED, 'Invalid or expired token.');
+        return sendErrorResponse(res, STATUS.UNAUTHORIZED, 'Invalid or expired token.', error.message);
     }
 };
 
@@ -40,6 +40,6 @@ export const adminAuthenticate = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (error) {
-        return sendErrorResponse(res, STATUS.UNAUTHORIZED, 'Invalid or expired token.');
+        return sendErrorResponse(res, STATUS.UNAUTHORIZED, 'Invalid or expired token.', error.message);
     }
 };

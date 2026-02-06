@@ -2,7 +2,7 @@ import { STATUS } from '../constants/statusCodes.js';
 import AppError from '../utils/AppError.js';
 import env from '../../config/env.js';
 
-export const errorHandler = (err, req, res, _next) => {
+export const errorHandler = (err, _req, res, _next) => {
     const statusCode = err instanceof AppError ? err.statusCode : STATUS.INTERNAL_ERROR;
 
     res.status(statusCode).json({

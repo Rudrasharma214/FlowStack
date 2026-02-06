@@ -1,6 +1,4 @@
-import Subscription from '../models/subscription.model.js';
 import Plan from '../models/plan.model.js';
-import Payment from '../models/payment.model.js';
 import { STATUS } from '../../../constants/statusCodes.js';
 import { createRazorpayOrder, verifyRazorpaySignature } from '../utils/payment.utils.js';
 import { sequelize } from '../../../../config/db.js';

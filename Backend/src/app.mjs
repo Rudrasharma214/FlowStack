@@ -29,7 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Store raw body for webhook signature verification
 app.use(express.json({
-    verify: (req, res, buf, encoding) => {
+    verify: (req, _res, buf, encoding) => {
         if (req.path.includes('/webhook')) {
             req.rawBody = buf.toString(encoding || 'utf8');
         }

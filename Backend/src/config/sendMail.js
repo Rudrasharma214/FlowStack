@@ -20,7 +20,7 @@ export const sendEmail = async ({ to, subject, html, text }) => {
             textContent: text
         };
 
-        const resp = await apiInstance.sendTransacEmail(sendSmtpEmail);
+        await apiInstance.sendTransacEmail(sendSmtpEmail);
 
         // Log email details
         logger.info('Email sent successfully', {

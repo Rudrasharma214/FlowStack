@@ -1,8 +1,8 @@
-import Payment from '../models/payment.model.js';
 import Subscription from '../models/subscription.model.js';
 import { publishEvent } from '../../../events/eventPublisher.js';
 import paymentNames from '../../../events/eventNames/paymentNames.js';
 import { PaymentRepository } from '../repositories/payment.repositories.js';
+import { STATUS } from '../../../constants/statusCodes.js';
 
 const paymentRepository = new PaymentRepository();
 

@@ -58,13 +58,9 @@ export const syncDB = async () => {
 };
 
 export const loadAssociations = async () => {
-    try {
-        logger.info('Loading model associations...');
-        await import('../core/modules/index.js');
-        logger.info('Model associations loaded');    
-    } catch (error) {
-        throw error;
-    }
+    logger.info('Loading model associations...');
+    await import('../core/modules/index.js');
+    logger.info('Model associations loaded');
 };
 
 export const disconnectDB = async () => {

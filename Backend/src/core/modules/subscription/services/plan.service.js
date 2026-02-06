@@ -1,6 +1,5 @@
 import { STATUS } from '../../../constants/statusCodes.js';
 import { Op } from 'sequelize';
-import Plan from '../models/plan.model.js';
 import { PlanRepository } from '../repositories/plan.repositories.js';
 
 const planRepository = new PlanRepository();

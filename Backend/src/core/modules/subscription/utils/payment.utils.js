@@ -51,7 +51,7 @@ export const createRazorpayOrder = async (amount, currency, receipt) => {
             created_at: order.created_at
         };
     } catch (error) {
-        throw new AppError('Failed to create Razorpay order', STATUS.INTERNAL_ERROR);
+        throw new AppError(error.message, STATUS.INTERNAL_ERROR);
     }
 };
 
@@ -75,6 +75,6 @@ export const verifyRazorpaySignature = (requestBody, signature) => {
         // Compare signature with hash
         return hash === signature;
     } catch (error) {
-        throw new AppError('Signature verification failed', STATUS.INTERNAL_ERROR);
+        throw new AppError(error.message, STATUS.INTERNAL_ERROR);
     }
 };
