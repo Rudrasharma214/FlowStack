@@ -1,22 +1,24 @@
 import { STATUS } from "../../../constants/statusCodes.js";
+import { Op } from "sequelize";
 import Plan from "../models/plan.model.js";
+import { PlanRepository } from "../repositories/plan.repositories.js";
 
+const planRepository = new PlanRepository();
 
 export class PlanService {
-    /* Get All Plans */
-    async getAllPlans(search) {
+    /* Get Active Plans */
+    async getActivePlans(search) {
         try {
-            let whereClause = {
-                is_active: true
-            };
+            let whereClause = {};
 
             if (search) {
                 whereClause = {
-                    name: { $like: `%${search}%` }
+                    ...whereClause,
+                    name: { [Op.like]: `%${search}%` }
                 };
             }
 
-            const plans = await Plan.findAll({ where: whereClause });
+            const plans = await planRepository.getActivePlans(whereClause);
 
             if (!plans) {
                 return {
@@ -42,10 +44,48 @@ export class PlanService {
         }
     }
 
+    /* Get All Plans for Admin */
+    async getAllPlans(search) {
+        try {
+            let whereClause = {};
+
+            if (search) {
+                whereClause = {
+                    ...whereClause,
+                    name: { [Op.like]: `%${search}%` }
+                };
+            }
+
+            const plans = await planRepository.getAllPlans(whereClause);
+
+            if (!plans) {
+                return {
+                    success: false,
+                    statusCode: STATUS.NOT_FOUND,
+                    message: "No plans found",
+                    errors: null
+                };
+            }
+
+            return {
+                success: true,
+                message: "Plans retrieved successfully",
+                data: plans
+            };
+        } catch (error) {
+            return {
+                success: false,
+                statusCode: STATUS.INTERNAL_ERROR,
+                message: "An error occurred while retrieving plans",
+                errors: error.message
+            }
+        }
+    };
+
     /* Create Plan */
     async createPlan(planData) {
         try {
-            const newPlan = await Plan.create(planData);
+            const newPlan = await planRepository.createPlan(planData);
 
             return {
                 success: true,
@@ -66,7 +106,7 @@ export class PlanService {
     /* Update Plan */
     async updatePlan(id, planData) {
         try {
-            const plan = await Plan.findByPk(id);
+            const plan = await planRepository.findById(id);
 
             if (!plan) {
                 return {
@@ -77,7 +117,7 @@ export class PlanService {
                 };
             }
 
-            await plan.update(planData);
+            await planRepository.updatePlan(id, planData);
 
             return {
                 success: true,
@@ -97,7 +137,7 @@ export class PlanService {
     /* Delete Plan */
     async deletePlan(id) {
         try {
-            const plan = await Plan.findByPk(id);
+            const plan = await planRepository.findById(id);
 
             if (!plan) {
                 return {
@@ -108,7 +148,7 @@ export class PlanService {
                 };
             }
 
-            await plan.destroy();
+            await planRepository.deletePlan(id);
 
             return {
                 success: true,

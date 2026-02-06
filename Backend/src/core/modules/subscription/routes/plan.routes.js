@@ -12,17 +12,25 @@ const planRoutes = express.Router();
 
 /**
  * Route to get all plans. Accessible to all users.
- * Path: /api/subscription/plans
+ * Path: /api/subscription/plans/active
  */
 planRoutes.get(
-    '/',
-    planController.getAllPlans
+    '/active',
+    planController.getActivePlans
 );
 
 /**
  * Route to create a new plan. Accessible only to admin users.
  */
 planRoutes.use(adminAuthenticate);
+
+/**
+ * Route to get all plans. Accessible only to admin users.
+ */
+planRoutes.get(
+    '/',
+    planController.getAllPlans
+);
 
 /**
  * Route to create a new plan. Accessible only to admin users.
