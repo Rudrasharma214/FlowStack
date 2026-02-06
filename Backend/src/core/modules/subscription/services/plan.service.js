@@ -18,7 +18,7 @@ export class PlanService {
                 };
             }
 
-            const plans = await planRepository.getActivePlans(whereClause);
+            const plans = await planRepository.getPlans({ where: whereClause, is_active: true });
 
             if (!plans) {
                 return {
@@ -56,7 +56,7 @@ export class PlanService {
                 };
             }
 
-            const plans = await planRepository.getAllPlans(whereClause);
+            const plans = await planRepository.getPlans({ where: whereClause });
 
             if (!plans) {
                 return {

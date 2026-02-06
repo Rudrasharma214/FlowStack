@@ -13,21 +13,23 @@ export class PlanRepository {
         }, { transaction });
     };
 
-    /* Get all active plans */
-    async getActivePlans(whereClause = {}, transaction = null) {
-        return await Plan.findAll({
-            where: { ...whereClause, is_active: true },
-            transaction
-        });
-    };
+    /* Get plans (active / all / filtered) */
+    async getPlans({
+        where = {},
+        is_active = false,
+        transaction = null
+    } = {}) {
+        const finalWhere = {
+            ...where,
+            ...(is_active ? { is_active: true } : {})
+        };
 
-    /* Get All plans */
-    async getAllPlans(whereClause = {}, transaction = null) {
         return await Plan.findAll({
-            where: { ...whereClause },
+            where: finalWhere,
             transaction
         });
-    };
+    }
+
 
     /* Find Plan by ID */
     async findById(planId, transaction = null) {
@@ -54,7 +56,7 @@ export class PlanRepository {
     }
 
     /* Delete Plan */
-    async deletePlan(planId, transaction = null) {  
+    async deletePlan(planId, transaction = null) {
         return await Plan.destroy({
             where: { id: planId },
             transaction
