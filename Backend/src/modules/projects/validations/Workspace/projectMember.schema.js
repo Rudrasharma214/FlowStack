@@ -1,4 +1,4 @@
-import joi from "joi";
+import joi from 'joi';
 
 export const projectMemberInviteSchema = joi.object({
     email: joi.string().email().required().messages({

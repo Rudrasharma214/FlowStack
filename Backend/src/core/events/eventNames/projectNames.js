@@ -1,6 +1,6 @@
 
 const projectNames = {
-    INVITE_MEMBER: 'invite_member',
+    INVITE_MEMBER: 'invite_member'
 };
 
 export default projectNames;

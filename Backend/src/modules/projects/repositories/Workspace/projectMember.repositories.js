@@ -1,4 +1,4 @@
-import ProjectInvitation from "../../models/Workspace/projectInvitation.model.js";
+import ProjectInvitation from '../../models/Workspace/projectInvitation.model.js';
 
 export class ProjectMemberRepository {
     

@@ -1,11 +1,11 @@
-import { sequelize } from "../../../../config/db.js";
-import { STATUS } from "../../../../core/constants/statusCodes.js";
-import projectNames from "../../../../core/events/eventNames/projectNames.js";
-import { publishEvent } from "../../../../core/events/eventPublisher.js";
-import { UserRepository } from "../../../../core/modules/auth/repositories/user.repositories.js";
-import { ProjectRepository } from "../../repositories/Workspace/project.repositories.js";
-import { ProjectMemberRepository } from "../../repositories/Workspace/projectMember.repositories.js";
-import { generateInviteToken } from "../../utils/inviteToken.utils.js";
+import { sequelize } from '../../../../config/db.js';
+import { STATUS } from '../../../../core/constants/statusCodes.js';
+import projectNames from '../../../../core/events/eventNames/projectNames.js';
+import { publishEvent } from '../../../../core/events/eventPublisher.js';
+import { UserRepository } from '../../../../core/modules/auth/repositories/user.repositories.js';
+import { ProjectRepository } from '../../repositories/Workspace/project.repositories.js';
+import { ProjectMemberRepository } from '../../repositories/Workspace/projectMember.repositories.js';
+import { generateInviteToken } from '../../utils/inviteToken.utils.js';
 
 const userRepository = new UserRepository();
 const projectRepository = new ProjectRepository();
@@ -17,14 +17,14 @@ export class ProjectMemberService {
     async inviteMember(projectId, email, userId) {
         const transaction = await sequelize.transaction();
         try {
-            const project = await projectRepository.getProjectByPk(projectId, transaction)
+            const project = await projectRepository.getProjectByPk(projectId, transaction);
             if(!project) {
                 await transaction.rollback();
                 return {
                     success: false,
                     message: 'Project not found',
-                    statusCode: STATUS.NOT_FOUND,
-                }
+                    statusCode: STATUS.NOT_FOUND
+                };
             };
             
             const existingInvitation = await projectMemberRepository.findInvitationByEmailAndProjectId(email, projectId, transaction);
@@ -33,8 +33,8 @@ export class ProjectMemberService {
                 return {
                     success: false, 
                     message: 'An invitation has already been sent to this email for the project',
-                    statusCode: STATUS.BAD_REQUEST,
-                }
+                    statusCode: STATUS.BAD_REQUEST
+                };
             };
 
             // Owner User
@@ -71,7 +71,7 @@ export class ProjectMemberService {
                 success: true,
                 message: 'Member invited successfully',
                 data: invitation,
-                statusCode: STATUS.OK,
+                statusCode: STATUS.OK
             };
         } catch (error) {
             await transaction.rollback();
@@ -79,8 +79,8 @@ export class ProjectMemberService {
                 success: false,
                 message: 'Failed to invite member to the project',
                 errors: error.message,
-                statusCode: STATUS.INTERNAL_ERROR,
-            }
+                statusCode: STATUS.INTERNAL_ERROR
+            };
         }
     };
 };

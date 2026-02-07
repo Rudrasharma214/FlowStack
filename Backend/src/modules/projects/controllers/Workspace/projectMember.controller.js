@@ -1,5 +1,5 @@
-import { sendResponse, sendErrorResponse } from "../../../../core/utils/response.js";
-import { STATUS } from "../../../../core/constants/statusCodes.js";
+import { sendResponse, sendErrorResponse } from '../../../../core/utils/response.js';
+import { STATUS } from '../../../../core/constants/statusCodes.js';
 
 export class ProjectMemberController {
     constructor(projectMemberService) {

@@ -20,12 +20,12 @@ export class ProjectRepository {
     }
 
     /* Get project details by ID */
-    async getProjectById(
+    async getProjectById({
         projectId,
         attributes = null,
         include = [],
         transaction = null
-    ) {
+    }) {
         return await Project.findOne({
             where: { id: projectId },
             attributes,

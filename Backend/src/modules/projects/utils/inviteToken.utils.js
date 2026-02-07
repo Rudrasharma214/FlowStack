@@ -20,13 +20,13 @@ export const verifyInviteToken = (token) => {
         }
 
         const decoded = jwt.verify(token, env.JWT_SECRET);
-        
+
         if (decoded.type !== 'project_invitation') {
             throw new AppError('Invalid token type', STATUS.BAD_REQUEST);
         }
 
         return decoded;
     } catch (error) {
-        throw new AppError('Invalid or expired token', STATUS.BAD_REQUEST);
+        throw new AppError(error.message, STATUS.BAD_REQUEST);
     }
 };

@@ -1,6 +1,6 @@
-import { Op } from "sequelize";
-import { STATUS } from "../../../../core/constants/statusCodes.js";
-import { ProjectRepository } from "../../repositories/Workspace/project.repositories.js";
+import { Op } from 'sequelize';
+import { STATUS } from '../../../../core/constants/statusCodes.js';
+import { ProjectRepository } from '../../repositories/Workspace/project.repositories.js';
 
 const projectRepository = new ProjectRepository();
 
@@ -16,14 +16,14 @@ export class ProjectService {
                 message: 'Project created successfully',
                 data: createdProject,
                 statusCode: STATUS.CREATED
-            }
+            };
         } catch (error) {
             return {
                 success: false,
                 message: 'An error occurred while creating the project',
                 errors: error.message,
                 statusCode: STATUS.INTERNAL_ERROR
-            }
+            };
         }
     };
 
@@ -42,7 +42,7 @@ export class ProjectService {
                 whereClause = {
                     ...whereClause,
                     name: { [Op.like]: `%${search}%` }
-                }
+                };
             }
 
             const projects = await projectRepository.getAllProjects(
@@ -53,7 +53,7 @@ export class ProjectService {
                     success: true,
                     message: 'No projects found',
                     statusCode: STATUS.NOT_FOUND
-                }
+                };
             }
 
             return {
@@ -67,47 +67,47 @@ export class ProjectService {
                         limit,
                         totalPages: Math.ceil(projects.count / limit)
                     }
-                },
-            }
+                }
+            };
         } catch (error) {
             return {
                 success: false,
                 message: 'An error occurred while fetching projects',
                 errors: error.message,
                 statusCode: STATUS.INTERNAL_ERROR
-            }
+            };
         }
-    }
+    };
 
     /* Get project details by ID */
     async getProjectById(projectId) {
         try {
-            const project = await projectRepository.getProjectById(
+            const project = await projectRepository.getProjectById({
                 projectId,
-                attributes = ['id', 'name', 'description', 'created_by', 'created_at', 'updated_at'],
-            );
+                attributes: ['id', 'name', 'description', 'created_by', 'created_at', 'updated_at']
+            });
             if (!project) {
                 return {
                     success: false,
                     message: 'Project not found',
                     statusCode: STATUS.NOT_FOUND
-                }
+                };
             }
 
             return {
                 success: true,
                 message: 'Project fetched successfully',
-                data: project,
-            }
+                data: project
+            };
         } catch (error) {
             return {
                 success: false,
                 message: 'An error occurred while fetching the project',
                 errors: error.message,
                 statusCode: STATUS.INTERNAL_ERROR
-            }
+            };
         }
-    }
+    };
 
     /* Update project details by ID */
     async updateProject(projectId, name, description, status, userId) {
@@ -118,12 +118,12 @@ export class ProjectService {
                     success: false,
                     message: 'Project not found',
                     statusCode: STATUS.NOT_FOUND
-                }
+                };
             }
 
-            const updateData = { 
-                name: name || project.name, 
-                description: description || project.description, 
+            const updateData = {
+                name: name || project.name,
+                description: description || project.description,
                 status: status || project.status,
                 updated_by: userId
             };
@@ -137,14 +137,14 @@ export class ProjectService {
                 success: true,
                 message: 'Project updated successfully',
                 data: result
-            }
+            };
         } catch (error) {
             return {
                 success: false,
                 message: 'An error occurred while updating the project',
                 errors: error.message,
                 statusCode: STATUS.INTERNAL_ERROR
-            }
+            };
         }
     };
 
@@ -157,23 +157,23 @@ export class ProjectService {
                     success: false,
                     message: 'Project not found',
                     statusCode: STATUS.NOT_FOUND
-                }
+                };
             }
 
             await projectRepository.deleteProject(projectId);
 
             return {
                 success: true,
-                message: 'Project deleted successfully',
-            }
+                message: 'Project deleted successfully'
+            };
         } catch (error) {
             return {
                 success: false,
                 message: 'An error occurred while deleting the project',
                 errors: error.message,
                 statusCode: STATUS.INTERNAL_ERROR
-            }
+            };
         }
     };
-    
+
 };

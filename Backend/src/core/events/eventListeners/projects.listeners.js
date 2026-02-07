@@ -1,5 +1,5 @@
-import { sendEmail } from "../../../config/sendMail.js";
-import eventBus from "../eventBus.events.js";
+import { sendEmail } from '../../../config/sendMail.js';
+import eventBus from '../eventBus.events.js';
 
 eventBus.on('project.invite_member', async (data) => {
     const { token,

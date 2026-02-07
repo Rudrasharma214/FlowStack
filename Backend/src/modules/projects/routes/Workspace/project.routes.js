@@ -25,7 +25,7 @@ projectRoutes.post(
     '/',
     validate(createProjectSchema),
     projectController.createProject
-)
+);
 
 /**
  * @route   /api/projects
