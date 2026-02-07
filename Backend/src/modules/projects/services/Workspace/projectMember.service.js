@@ -4,13 +4,14 @@ import projectNames from '../../../../core/events/eventNames/projectNames.js';
 import { publishEvent } from '../../../../core/events/eventPublisher.js';
 import { UserRepository } from '../../../../core/modules/auth/repositories/user.repositories.js';
 import { ProjectRepository } from '../../repositories/Workspace/project.repositories.js';
+import { ProjectInvitationRepository } from '../../repositories/Workspace/projectInvitation.repositories.js';
 import { ProjectMemberRepository } from '../../repositories/Workspace/projectMember.repositories.js';
 import { generateInviteToken } from '../../utils/inviteToken.utils.js';
 
 const userRepository = new UserRepository();
 const projectRepository = new ProjectRepository();
+const projectInvitationRepository = new ProjectInvitationRepository();
 const projectMemberRepository = new ProjectMemberRepository();
-
 export class ProjectMemberService {
     
     /* Invite a member to a project */
@@ -27,7 +28,7 @@ export class ProjectMemberService {
                 };
             };
             
-            const existingInvitation = await projectMemberRepository.findInvitationByEmailAndProjectId(email, projectId, transaction);
+            const existingInvitation = await projectInvitationRepository.findInvitationByEmailAndProjectId(email, projectId, transaction);
             if(existingInvitation) {
                 await transaction.rollback();
                 return {
@@ -55,11 +56,11 @@ export class ProjectMemberService {
                 invited_by: userId
             };
 
-            const invitation = await projectMemberRepository.createProjectInvitation(data, { transaction });
+            const invitation = await projectInvitationRepository.createProjectInvitation(data, { transaction });
 
             await transaction.commit();
             
-            publishEvent(projectNames.INVITE_MEMBER, { 
+            publishEvent(projectNames.INVITE_MEMBER, {
                 token, 
                 email, 
                 projectName: project.name, 
@@ -78,6 +79,59 @@ export class ProjectMemberService {
             return {
                 success: false,
                 message: 'Failed to invite member to the project',
+                errors: error.message,
+                statusCode: STATUS.INTERNAL_ERROR
+            };
+        }
+    };
+
+    /* Accept a project invitation */
+    async acceptInvitation(token, email, projectId) {
+        const transaction = await sequelize.transaction();
+        try {
+            const invitation = await projectInvitationRepository.findInvitationByEmailAndProjectId(email, projectId, transaction);
+            if(!invitation || invitation.token !== token || invitation.status !== 'pending' || new Date() > invitation.expires_at) {
+                await transaction.rollback();
+                return {
+                    success: false,
+                    message: 'Invalid or expired invitation token',
+                    statusCode: STATUS.BAD_REQUEST
+                };
+            }
+
+            const project = await projectRepository.getProjectByPk(projectId, transaction);
+            if(!project) {
+                await transaction.rollback();
+                return {
+                    success: false,
+                    message: 'Project not found',
+                    statusCode: STATUS.NOT_FOUND
+                };
+            }
+            const data = { 
+                project_id: projectId, 
+                user_id: invitation.user_id,
+                role: 'member',
+                added_by: invitation.invited_by
+            };
+
+            // Add the user to the project members
+            await projectMemberRepository.createProjectMember(data, transaction);
+
+            await projectInvitationRepository.updateInvitationStatus(invitation.id, 'accepted', transaction);
+
+            await transaction.commit();
+
+            return {
+                success: true,
+                message: 'Invitation accepted successfully',
+                statusCode: STATUS.OK
+            };
+        } catch (error) {
+            await transaction.rollback();
+            return  {
+                success: false,
+                message: 'Failed to accept the project invitation',
                 errors: error.message,
                 statusCode: STATUS.INTERNAL_ERROR
             };

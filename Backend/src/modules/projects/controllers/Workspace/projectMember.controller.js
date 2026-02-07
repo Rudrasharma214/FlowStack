@@ -5,6 +5,7 @@ export class ProjectMemberController {
     constructor(projectMemberService) {
         this.projectMemberService = projectMemberService;
         this.inviteMember = this.inviteMember.bind(this);
+        this.acceptInvitation = this.acceptInvitation.bind(this);
     };
 
     /* Invite an member */
@@ -29,4 +30,25 @@ export class ProjectMemberController {
             next(error);
         }
     };
+
+    /* Accept a project invitation */
+    async acceptInvitation(req, res, next) {
+        try {
+            const { token, email, projectId } = req.body;
+
+            const result = await this.projectMemberService.acceptInvitation(
+                token,
+                email,
+                parseInt(projectId)
+            );
+
+            if(!result) {
+                return sendErrorResponse(res, result.statusCode, result.message, result.errors);
+            }
+
+            return sendResponse(res, STATUS.OK, result.message, result.data);
+        } catch (error) {
+            next(error);
+        }
+    }
 };

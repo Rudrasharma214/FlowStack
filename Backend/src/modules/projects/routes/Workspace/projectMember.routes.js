@@ -7,18 +7,29 @@ import { ProjectMemberService } from '../../services/Workspace/projectMember.ser
 
 const projectMemberService = new ProjectMemberService();
 const projectMemberController = new ProjectMemberController(projectMemberService);
-const projectMemberRouter = express.Router({ mergeParams: true });
+
+const projectMemberRoutes = express.Router({ mergeParams: true });
 
 /**
  * @route   POST /api/projects/:projectId/members
  * @desc    Send an invitation to a user to join the project as a member
  * @access  Protected (requires authentication)
  */
-projectMemberRouter.post(
+projectMemberRoutes.post(
     '/',
     authenticate,
     validate(projectMemberInviteSchema),
     projectMemberController.inviteMember
 );
 
-export default projectMemberRouter;
+/**
+ * @route   GET /api/projects/:projectId/accept-invitation
+ * @desc    Accept a project invitation
+ * @access  Protected (requires authentication)
+ */
+projectMemberRoutes.post(
+    '/accept-invitation',
+    projectMemberController.acceptInvitation
+);
+
+export default projectMemberRoutes;
