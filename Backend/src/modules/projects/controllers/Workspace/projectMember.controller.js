@@ -14,10 +14,11 @@ export class ProjectMemberController {
         try {
             const { id: userId } = req.user;
             const { projectId } = req.params;
-            const { email } = req.body;
+            const { name, email } = req.body;
 
             const invitation = await this.projectMemberService.inviteMember(
                 projectId,
+                name,
                 email,
                 userId
             );

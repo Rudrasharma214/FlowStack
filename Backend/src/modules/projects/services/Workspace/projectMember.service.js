@@ -15,7 +15,7 @@ const projectMemberRepository = new ProjectMemberRepository();
 export class ProjectMemberService {
     
     /* Invite a member to a project */
-    async inviteMember(projectId, email, userId) {
+    async inviteMember(projectId, name, email, userId) {
         const transaction = await sequelize.transaction();
         try {
             const project = await projectRepository.getProjectByPk(projectId, transaction);
@@ -41,19 +41,20 @@ export class ProjectMemberService {
             // Owner User
             const user = await userRepository.findById(userId, transaction);
             // Invited User
-            const isUser = await userRepository.findByEmail(email, transaction);
-            const isUserId = isUser ? isUser.id : null;
+            const invitedUser = await userRepository.findByEmail(email, transaction);
+            const invitedUserId = invitedUser ? invitedUser.id : null;
             
             const token = generateInviteToken(projectId, email);
             const data = {
                 project_id: projectId,
-                user_id: isUserId,
+                user_id: invitedUserId,
                 email,
                 token,
                 expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
                 status: 'pending',
                 invited_at: new Date(),
-                invited_by: userId
+                invited_by: userId,
+                name
             };
 
             const invitation = await projectInvitationRepository.createProjectInvitation(data, { transaction });
@@ -64,8 +65,8 @@ export class ProjectMemberService {
                 token, 
                 email, 
                 projectName: project.name, 
-                userName: user.name, 
-                invitedUserName: isUserId ? isUser.name : null 
+                inviterName: user.name, 
+                invitedUserName: invitedUserId ? invitedUser.name : name,
             });
 
             return {

@@ -24,6 +24,12 @@ const ProjectInvitation = sequelize.define(
             comment: 'Foreign key referencing the user'
         },
 
+        name: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            comment: 'Name of the invited user (optional, can be used for personalized invitations)'
+        },
+
         email: {
             type: DataTypes.STRING,
             allowNull: false,
