@@ -1,6 +1,5 @@
 import { sendResponse, sendErrorResponse } from '../../../../core/utils/response.js';
 import { STATUS } from '../../../../core/constants/statusCodes.js';
-import logger from '../../../../config/logger.js';
 
 export class ProjectMemberController {
     constructor(projectMemberService) {
@@ -14,8 +13,6 @@ export class ProjectMemberController {
     /* Invite an member */
 
     async inviteMember(req, res, next) {
-        const requestId = crypto.randomUUID();
-
         try {
             const { id: userId } = req.user;
             const { projectId } = req.params;
@@ -61,12 +58,10 @@ export class ProjectMemberController {
     /* Accept a project invitation */
     async acceptInvitation(req, res, next) {
         try {
-            const { token, email, projectId } = req.body;
+            const { token } = req.body;
 
             const result = await this.projectMemberService.acceptInvitation(
-                token,
-                email,
-                parseInt(projectId)
+                token
             );
 
             if (!result.success) {
@@ -82,12 +77,10 @@ export class ProjectMemberController {
     /* Reject a project invitation */
     async rejectInvitation(req, res, next) {
         try {
-            const { token, email, projectId } = req.body;
+            const { token } = req.body;
 
             const result = await this.projectMemberService.rejectInvitation(
-                token,
-                email,
-                parseInt(projectId)
+                token
             );
 
             if (!result.success) {

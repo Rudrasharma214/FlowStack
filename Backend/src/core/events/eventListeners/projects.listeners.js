@@ -1,5 +1,4 @@
 import env from '../../../config/env.js';
-import logger from '../../../config/logger.js';
 import { sendEmail } from '../../../config/sendMail.js';
 import { sendProjectInviteTokenTemplate } from '../../templates/projectTemplates/sendInviteToken.template.js';
 import eventBus from '../eventBus.events.js';

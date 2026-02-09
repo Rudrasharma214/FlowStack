@@ -1,5 +1,4 @@
 import { sequelize } from '../../../../config/db.js';
-import logger from '../../../../config/logger.js';
 import { STATUS } from '../../../../core/constants/statusCodes.js';
 import projectNames from '../../../../core/events/eventNames/projectNames.js';
 import { publishEvent } from '../../../../core/events/eventPublisher.js';
@@ -18,8 +17,6 @@ export class ProjectMemberService {
     /* Invite a member to a project */
     async inviteMember(projectId, name, email, userId) {
         const transaction = await sequelize.transaction();
-        const traceId = crypto.randomUUID();
-
         try {
             const project = await projectRepository.getProjectByPk(
                 projectId,
@@ -31,8 +28,8 @@ export class ProjectMemberService {
 
                 return {
                     success: false,
-                    message: "Project not found",
-                    statusCode: STATUS.NOT_FOUND,
+                    message: 'Project not found',
+                    statusCode: STATUS.NOT_FOUND
                 };
             }
 
@@ -48,8 +45,8 @@ export class ProjectMemberService {
                 return {
                     success: false,
                     message:
-                        "An invitation has already been sent to this email for the project",
-                    statusCode: STATUS.BAD_REQUEST,
+                        'An invitation has already been sent to this email for the project',
+                    statusCode: STATUS.BAD_REQUEST
                 };
             }
 
@@ -67,10 +64,10 @@ export class ProjectMemberService {
                 email,
                 token,
                 expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-                status: "pending",
+                status: 'pending',
                 invited_at: new Date(),
                 invited_by: userId,
-                name,
+                name
             };
             const invitation = await projectInvitationRepository.createProjectInvitation(data, transaction);
 
@@ -81,22 +78,22 @@ export class ProjectMemberService {
                 email,
                 projectName: project.name,
                 inviterName: user.name,
-                invitedUserName: invitedUserId ? invitedUser.name : name,
+                invitedUserName: invitedUserId ? invitedUser.name : name
             });
 
             return {
                 success: true,
-                message: "Member invited successfully",
+                message: 'Member invited successfully',
                 data: invitation,
-                statusCode: STATUS.OK,
+                statusCode: STATUS.OK
             };
         } catch (error) {
             await transaction.rollback();
             return {
                 success: false,
-                message: "Failed to invite member to the project",
+                message: 'Failed to invite member to the project',
                 errors: error.message,
-                statusCode: STATUS.INTERNAL_ERROR,
+                statusCode: STATUS.INTERNAL_ERROR
             };
         }
     }
@@ -147,10 +144,11 @@ export class ProjectMemberService {
     };
 
     /* Accept a project invitation */
-    async acceptInvitation(token, email, projectId) {
+    async acceptInvitation(token) {
         const transaction = await sequelize.transaction();
         try {
-            const invitation = await projectInvitationRepository.findInvitationByEmailAndProjectId(email, projectId, transaction);
+            const isToken = await verifyInviteToken(token);
+            const invitation = await projectInvitationRepository.findInvitationByEmailAndProjectId(isToken.email, isToken.projectId, transaction);
             if (!invitation || invitation.token !== token || invitation.status !== 'pending' || new Date() > invitation.expires_at) {
                 await transaction.rollback();
                 return {
@@ -160,7 +158,7 @@ export class ProjectMemberService {
                 };
             }
 
-            const project = await projectRepository.getProjectByPk(projectId, transaction);
+            const project = await projectRepository.getProjectByPk(isToken.projectId, transaction);
             if (!project) {
                 await transaction.rollback();
                 return {
@@ -170,7 +168,7 @@ export class ProjectMemberService {
                 };
             }
             const data = {
-                project_id: projectId,
+                project_id: isToken.projectId,
                 user_id: invitation.user_id,
                 role: 'member',
                 added_by: invitation.invited_by
@@ -200,10 +198,11 @@ export class ProjectMemberService {
     };
 
     /* Reject a project invitation */
-    async rejectInvitation(token, email, projectId) {
+    async rejectInvitation(token) {
         const transaction = await sequelize.transaction();
         try {
-            const invitation = await projectInvitationRepository.findInvitationByEmailAndProjectId(email, projectId, transaction);
+            const isToken = await verifyInviteToken(token);
+            const invitation = await projectInvitationRepository.findInvitationByEmailAndProjectId(isToken.email, isToken.projectId, transaction);
             if (!invitation || invitation.token !== token || invitation.status !== 'pending' || new Date() > invitation.expires_at) {
                 await transaction.rollback();
                 return {

@@ -33,7 +33,7 @@ export class ProjectService {
             const offset = (page - 1) * limit;
 
             let whereClause = {
-                created_by: userId,
+                created_by: userId
             };
 
             if (search) {
