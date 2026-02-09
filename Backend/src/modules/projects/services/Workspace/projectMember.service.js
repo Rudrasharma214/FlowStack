@@ -85,11 +85,55 @@ export class ProjectMemberService {
         }
     };
 
+    /* Verify a project invitation */
+    async verifyInvitation(token) {
+        try {   
+            const isToken  = await verifyInviteToken(token);
+            
+            const invitation = await projectInvitationRepository.findInvitationByEmailAndProjectId(isToken.email, isToken.projectId);
+            if(!invitation || invitation.token !== token || invitation.status !== 'pending' || new Date() > invitation.expires_at) {
+                return {
+                    success: false,
+                    message: 'Invalid or expired invitation token',
+                    statusCode: STATUS.BAD_REQUEST
+                };
+            }
+
+            const user = invitation.user_id ? await userRepository.findById(invitation.user_id) : null;
+            if(!user) {
+                return {
+                    success: true,
+                    message: 'Invitation token is valid',
+                    data: {
+                        token,
+                        registration: true
+                    },
+                    statusCode: STATUS.OK
+                };
+            }           
+            return {
+                success: true,
+                message: 'Invitation token is valid',
+                data: {
+                    token,
+                    registration: false
+                },
+                statusCode: STATUS.OK
+            };
+        } catch (error) {
+            return {
+                success: false,
+                message: 'Failed to verify the project invitation',
+                errors: error.message,
+                statusCode: STATUS.INTERNAL_ERROR
+            };
+        }
+    };
+
     /* Accept a project invitation */
     async acceptInvitation(token, email, projectId) {
         const transaction = await sequelize.transaction();
         try {
-            await verifyInviteToken(token);
             const invitation = await projectInvitationRepository.findInvitationByEmailAndProjectId(email, projectId, transaction);
             if(!invitation || invitation.token !== token || invitation.status !== 'pending' || new Date() > invitation.expires_at) {
                 await transaction.rollback();
@@ -143,7 +187,6 @@ export class ProjectMemberService {
     async rejectInvitation(token, email, projectId) {
         const transaction = await sequelize.transaction();
         try {
-            await verifyInviteToken(token);
             const invitation = await projectInvitationRepository.findInvitationByEmailAndProjectId(email, projectId, transaction);
             if(!invitation || invitation.token !== token || invitation.status !== 'pending' || new Date() > invitation.expires_at) {
                 await transaction.rollback();

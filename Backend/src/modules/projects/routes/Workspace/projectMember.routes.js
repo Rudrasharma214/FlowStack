@@ -22,6 +22,11 @@ projectMemberRoutes.post(
     projectMemberController.inviteMember
 );
 
+projectMemberRoutes.post(
+    '/verify-invitation',
+    projectMemberController.verifyInvitation
+);
+
 /**
  * @route   GET /api/projects/:projectId/accept-invitation
  * @desc    Accept a project invitation

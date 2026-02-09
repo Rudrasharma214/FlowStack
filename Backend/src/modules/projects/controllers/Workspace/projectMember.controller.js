@@ -32,6 +32,21 @@ export class ProjectMemberController {
         }
     };
 
+    /* Verify a project invitation */
+    async verifyInvitation(req, res, next) {
+        try {
+            const { token } = req.body;
+
+            const result = await this.projectMemberService.verifyInvitation(token);
+            if(!result) {
+                return sendErrorResponse(res, result.statusCode, result.message, result.errors);
+            }
+
+            return sendResponse(res, STATUS.OK, result.message, result.data);
+        } catch (error) {
+            next(error);
+        }
+    }
     /* Accept a project invitation */
     async acceptInvitation(req, res, next) {
         try {
