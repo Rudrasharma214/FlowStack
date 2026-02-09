@@ -14,8 +14,8 @@ export class ProjectRepository {
     }
 
     /* Get all projects */
-    async getAllProjects(whereClause, transaction = null) {
-        const { rows, count } = await Project.findAndCountAll({ where: whereClause, transaction });
+    async getAllProjects(whereClause, offset = 0, limit = 10, transaction = null) {
+        const { rows, count } = await Project.findAndCountAll({ where: whereClause, offset, limit, transaction });
         return { rows, count };
     }
 

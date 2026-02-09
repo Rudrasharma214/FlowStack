@@ -24,7 +24,7 @@ export class ProjectController {
                 created_by: userId
             });
 
-            if (!result) {
+            if (!result.success) {
                 return sendErrorResponse(res, result.statusCode, result.message, result.errors);
             }
 
@@ -46,7 +46,7 @@ export class ProjectController {
                 search
             );
 
-            if (!result) {
+            if (!result.success) {
                 return sendErrorResponse(res, result.statusCode, result.message, result.errors);
             }
 
@@ -62,7 +62,7 @@ export class ProjectController {
             const { projectId } = req.params;
             const result = await this.projectService.getProjectById(projectId);
 
-            if (!result) {
+            if (!result.success) {
                 return sendErrorResponse(res, result.statusCode, result.message, result.errors);
             }
 
@@ -87,7 +87,7 @@ export class ProjectController {
                 parseInt(userId)
             );
 
-            if (!result) {
+            if (!result.success) {
                 return sendErrorResponse(res, result.statusCode, result.message, result.errors);
             }
 
@@ -104,7 +104,7 @@ export class ProjectController {
 
             const result = await this.projectService.deleteProject(parseInt(projectId));
 
-            if (!result) {
+            if (!result.success) {
                 return sendErrorResponse(res, result.statusCode, result.message, result.errors);
             }
 

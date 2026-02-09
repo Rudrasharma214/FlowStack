@@ -21,8 +21,8 @@ export class ProjectService {
             return {
                 success: false,
                 message: 'An error occurred while creating the project',
-                errors: error.message,
-                statusCode: STATUS.INTERNAL_ERROR
+                statusCode: STATUS.INTERNAL_ERROR,
+                errors: error.message
             };
         }
     };
@@ -34,8 +34,6 @@ export class ProjectService {
 
             let whereClause = {
                 created_by: userId,
-                offset,
-                limit
             };
 
             if (search) {
@@ -46,12 +44,23 @@ export class ProjectService {
             }
 
             const projects = await projectRepository.getAllProjects(
-                whereClause
+                whereClause,
+                offset,
+                limit
             );
-            if (!projects) {
+            if (!projects || projects.count === 0) {
                 return {
                     success: true,
                     message: 'No projects found',
+                    data: {
+                        projects: [],
+                        pagination: {
+                            total: 0,
+                            page,   
+                            limit,
+                            totalPages: 0
+                        }
+                    },
                     statusCode: STATUS.NOT_FOUND
                 };
             }
@@ -84,7 +93,7 @@ export class ProjectService {
         try {
             const project = await projectRepository.getProjectById({
                 projectId,
-                attributes: ['id', 'name', 'description', 'created_by', 'created_at', 'updated_at']
+                attributes: ['id', 'name', 'description', 'status', 'created_by', 'created_at', 'updated_at']
             });
             if (!project) {
                 return {

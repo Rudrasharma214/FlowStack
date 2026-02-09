@@ -8,7 +8,8 @@
     "start": "node src/server.mjs",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "migrate": "sequelize-cli db:migrate --config src/config/sequelize-cli.cjs",
+    "migrate:undo": "sequelize-cli db:migrate:undo --config src/config/sequelize-cli.cjs"
   },
   "keywords": [],
   "author": "",
