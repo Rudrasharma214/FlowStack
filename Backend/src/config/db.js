@@ -2,9 +2,6 @@ import { Sequelize } from 'sequelize';
 import env from './env.js';
 import logger from './logger.js';
 
-// Modules Associations Import
-import { ProjectAssociations } from '../modules/projects/index.js';
-
 export const sequelize = new Sequelize(
     env.DB_NAME,
     env.DB_USER,
@@ -62,6 +59,8 @@ export const connectDB = async () => {
 
 export const loadAssociations = async () => {
     logger.info('Loading model associations...');
+    // import all association here to avoid circular dependencies
+    const { ProjectAssociations } = await import('../modules/projects/index.js');
 
     await import('../core/modules/index.js');
     ProjectAssociations();

@@ -6,7 +6,8 @@
  * @version 1.0.0
  * @description This module handles all project-related operations, including project creation, management, and collaboration.
  */
-export { projectsRouter } from './routes/index.js';
+import projectsRouter from './routes/index.js';
+export { projectsRouter };
 
 /**
  * Bind all associations in the project management module
