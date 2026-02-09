@@ -1,4 +1,5 @@
 import { sequelize } from '../../../../config/db.js';
+import logger from '../../../../config/logger.js';
 import { STATUS } from '../../../../core/constants/statusCodes.js';
 import projectNames from '../../../../core/events/eventNames/projectNames.js';
 import { publishEvent } from '../../../../core/events/eventPublisher.js';
@@ -13,37 +14,52 @@ const projectRepository = new ProjectRepository();
 const projectInvitationRepository = new ProjectInvitationRepository();
 const projectMemberRepository = new ProjectMemberRepository();
 export class ProjectMemberService {
-    
+
     /* Invite a member to a project */
     async inviteMember(projectId, name, email, userId) {
         const transaction = await sequelize.transaction();
+        const traceId = crypto.randomUUID();
+
         try {
-            const project = await projectRepository.getProjectByPk(projectId, transaction);
-            if(!project) {
+            const project = await projectRepository.getProjectByPk(
+                projectId,
+                transaction
+            );
+
+            if (!project) {
+                await transaction.rollback();
+
+                return {
+                    success: false,
+                    message: "Project not found",
+                    statusCode: STATUS.NOT_FOUND,
+                };
+            }
+
+            const existingInvitation =
+                await projectInvitationRepository.findInvitationByEmailAndProjectId(
+                    email,
+                    projectId,
+                    transaction
+                );
+
+            if (existingInvitation) {
                 await transaction.rollback();
                 return {
                     success: false,
-                    message: 'Project not found',
-                    statusCode: STATUS.NOT_FOUND
+                    message:
+                        "An invitation has already been sent to this email for the project",
+                    statusCode: STATUS.BAD_REQUEST,
                 };
-            };
-            
-            const existingInvitation = await projectInvitationRepository.findInvitationByEmailAndProjectId(email, projectId, transaction);
-            if(existingInvitation) {
-                await transaction.rollback();
-                return {
-                    success: false, 
-                    message: 'An invitation has already been sent to this email for the project',
-                    statusCode: STATUS.BAD_REQUEST
-                };
-            };
+            }
 
-            // Owner User
+            // Owner who is inviting the member
             const user = await userRepository.findById(userId, transaction);
-            // Invited User
+
+            // Check if the invited user already exists in the system
             const invitedUser = await userRepository.findByEmail(email, transaction);
             const invitedUserId = invitedUser ? invitedUser.id : null;
-            
+
             const token = generateInviteToken(projectId, email);
             const data = {
                 project_id: projectId,
@@ -51,48 +67,47 @@ export class ProjectMemberService {
                 email,
                 token,
                 expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-                status: 'pending',
+                status: "pending",
                 invited_at: new Date(),
                 invited_by: userId,
-                name
+                name,
             };
-
-            const invitation = await projectInvitationRepository.createProjectInvitation(data, { transaction });
+            const invitation = await projectInvitationRepository.createProjectInvitation(data, transaction);
 
             await transaction.commit();
-            
+
             publishEvent(projectNames.INVITE_MEMBER, {
-                token, 
-                email, 
-                projectName: project.name, 
-                inviterName: user.name, 
+                token,
+                email,
+                projectName: project.name,
+                inviterName: user.name,
                 invitedUserName: invitedUserId ? invitedUser.name : name,
             });
 
             return {
                 success: true,
-                message: 'Member invited successfully',
+                message: "Member invited successfully",
                 data: invitation,
-                statusCode: STATUS.OK
+                statusCode: STATUS.OK,
             };
         } catch (error) {
             await transaction.rollback();
             return {
                 success: false,
-                message: 'Failed to invite member to the project',
+                message: "Failed to invite member to the project",
                 errors: error.message,
-                statusCode: STATUS.INTERNAL_ERROR
+                statusCode: STATUS.INTERNAL_ERROR,
             };
         }
-    };
+    }
 
     /* Verify a project invitation */
     async verifyInvitation(token) {
-        try {   
-            const isToken  = await verifyInviteToken(token);
-            
+        try {
+            const isToken = await verifyInviteToken(token);
+
             const invitation = await projectInvitationRepository.findInvitationByEmailAndProjectId(isToken.email, isToken.projectId);
-            if(!invitation || invitation.token !== token || invitation.status !== 'pending' || new Date() > invitation.expires_at) {
+            if (!invitation || invitation.token !== token || invitation.status !== 'pending' || new Date() > invitation.expires_at) {
                 return {
                     success: false,
                     message: 'Invalid or expired invitation token',
@@ -101,7 +116,7 @@ export class ProjectMemberService {
             }
 
             const user = invitation.user_id ? await userRepository.findById(invitation.user_id) : null;
-            if(!user) {
+            if (!user) {
                 return {
                     success: true,
                     message: 'Invitation token is valid',
@@ -111,7 +126,7 @@ export class ProjectMemberService {
                     },
                     statusCode: STATUS.OK
                 };
-            }           
+            }
             return {
                 success: true,
                 message: 'Invitation token is valid',
@@ -136,7 +151,7 @@ export class ProjectMemberService {
         const transaction = await sequelize.transaction();
         try {
             const invitation = await projectInvitationRepository.findInvitationByEmailAndProjectId(email, projectId, transaction);
-            if(!invitation || invitation.token !== token || invitation.status !== 'pending' || new Date() > invitation.expires_at) {
+            if (!invitation || invitation.token !== token || invitation.status !== 'pending' || new Date() > invitation.expires_at) {
                 await transaction.rollback();
                 return {
                     success: false,
@@ -146,7 +161,7 @@ export class ProjectMemberService {
             }
 
             const project = await projectRepository.getProjectByPk(projectId, transaction);
-            if(!project) {
+            if (!project) {
                 await transaction.rollback();
                 return {
                     success: false,
@@ -154,8 +169,8 @@ export class ProjectMemberService {
                     statusCode: STATUS.NOT_FOUND
                 };
             }
-            const data = { 
-                project_id: projectId, 
+            const data = {
+                project_id: projectId,
                 user_id: invitation.user_id,
                 role: 'member',
                 added_by: invitation.invited_by
@@ -164,7 +179,7 @@ export class ProjectMemberService {
             // Add the user to the project members
             await projectMemberRepository.createProjectMember(data, transaction);
 
-            await projectInvitationRepository.updateInvitationStatus(invitation.id, 'accepted', transaction);
+            await projectInvitationRepository.updateInvitationStatus(invitation.id, 'accepted', new Date(), transaction);
 
             await transaction.commit();
 
@@ -175,7 +190,7 @@ export class ProjectMemberService {
             };
         } catch (error) {
             await transaction.rollback();
-            return  {
+            return {
                 success: false,
                 message: 'Failed to accept the project invitation',
                 errors: error.message,
@@ -189,7 +204,7 @@ export class ProjectMemberService {
         const transaction = await sequelize.transaction();
         try {
             const invitation = await projectInvitationRepository.findInvitationByEmailAndProjectId(email, projectId, transaction);
-            if(!invitation || invitation.token !== token || invitation.status !== 'pending' || new Date() > invitation.expires_at) {
+            if (!invitation || invitation.token !== token || invitation.status !== 'pending' || new Date() > invitation.expires_at) {
                 await transaction.rollback();
                 return {
                     success: false,
@@ -198,7 +213,7 @@ export class ProjectMemberService {
                 };
             }
 
-            await projectInvitationRepository.updateInvitationStatus(invitation.id, 'rejected', transaction);
+            await projectInvitationRepository.updateInvitationStatus(invitation.id, 'rejected', new Date(), transaction);
 
             await transaction.commit();
 
@@ -206,7 +221,7 @@ export class ProjectMemberService {
                 success: true,
                 message: 'Invitation rejected successfully',
                 statusCode: STATUS.OK
-            };            
+            };
         } catch (error) {
             await transaction.rollback();
             return {

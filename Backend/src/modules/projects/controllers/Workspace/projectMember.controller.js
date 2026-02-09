@@ -1,16 +1,21 @@
 import { sendResponse, sendErrorResponse } from '../../../../core/utils/response.js';
 import { STATUS } from '../../../../core/constants/statusCodes.js';
+import logger from '../../../../config/logger.js';
 
 export class ProjectMemberController {
     constructor(projectMemberService) {
         this.projectMemberService = projectMemberService;
         this.inviteMember = this.inviteMember.bind(this);
+        this.verifyInvitation = this.verifyInvitation.bind(this);
         this.acceptInvitation = this.acceptInvitation.bind(this);
         this.rejectInvitation = this.rejectInvitation.bind(this);
     };
 
     /* Invite an member */
+
     async inviteMember(req, res, next) {
+        const requestId = crypto.randomUUID();
+
         try {
             const { id: userId } = req.user;
             const { projectId } = req.params;
@@ -23,15 +28,20 @@ export class ProjectMemberController {
                 userId
             );
 
-            if(!invitation) {
+            if (!invitation.success) {
                 return sendErrorResponse(res, invitation.statusCode, invitation.message, invitation.errors);
             }
-
-            return sendResponse(res, STATUS.CREATED, invitation.message, invitation.data);
+            return sendResponse(
+                res,
+                STATUS.CREATED,
+                invitation.message,
+                invitation.data
+            );
         } catch (error) {
             next(error);
         }
-    };
+    }
+
 
     /* Verify a project invitation */
     async verifyInvitation(req, res, next) {
@@ -39,7 +49,7 @@ export class ProjectMemberController {
             const { token } = req.body;
 
             const result = await this.projectMemberService.verifyInvitation(token);
-            if(!result) {
+            if (!result.success) {
                 return sendErrorResponse(res, result.statusCode, result.message, result.errors);
             }
 
@@ -59,7 +69,7 @@ export class ProjectMemberController {
                 parseInt(projectId)
             );
 
-            if(!result) {
+            if (!result.success) {
                 return sendErrorResponse(res, result.statusCode, result.message, result.errors);
             }
 
@@ -80,7 +90,7 @@ export class ProjectMemberController {
                 parseInt(projectId)
             );
 
-            if(!result) {
+            if (!result.success) {
                 return sendErrorResponse(res, result.statusCode, result.message, result.errors);
             }
 

@@ -13,9 +13,9 @@ export class ProjectInvitationRepository {
     };
 
     /* Update Invitation Status */
-    async updateInvitationStatus(invitationId, status, transaction = null) {
+    async updateInvitationStatus(invitationId, status, action_at, transaction = null) {
         return await ProjectInvitation.update(
-            { status },
+            { status, action_at },
             { where: { id: invitationId }, transaction }
         );
     };
