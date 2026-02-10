@@ -77,6 +77,12 @@ const ProjectTask = sequelize.define(
             type: DataTypes.DATE,
             allowNull: true,
             comment: 'Timestamp when the task was marked as completed'
+        },
+
+        updated_by: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            comment: 'User ID of the person who last updated the task'
         }
     },
     {

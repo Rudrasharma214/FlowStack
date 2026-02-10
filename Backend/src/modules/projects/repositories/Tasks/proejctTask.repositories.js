@@ -13,22 +13,17 @@ export class ProjectTaskRepository {
     };
 
     /* Get Task by ID */
-    async getTaskById(taskId, transaction = null) {
-        return await ProjectTask.findByPk(taskId, { transaction });
+    async getTaskById(projectId, taskId, transaction = null) {
+        return await ProjectTask.findOne({ where: { projectId, id: taskId }, transaction });
     };
 
     /* Update Task */
-    async updateTask(taskId, data, transaction = null) {
-        const task = await ProjectTask.findByPk(taskId, { transaction });
-        if (!task) return null;
-        return await task.update(data, { transaction });
+    async updateTask(projectId, taskId, data, transaction = null) {
+        return await ProjectTask.update(data, { where: { projectId, id: taskId }, transaction });
     };
 
     /* Delete Task */
-    async deleteTask(taskId, transaction = null) {
-        const task = await ProjectTask.findByPk(taskId, { transaction });
-        if (!task) return null;
-        await task.destroy({ transaction });
-        return task;
+    async deleteTask(projectId, taskId, transaction = null) {
+        return await ProjectTask.destroy({ where: { projectId, id: taskId }, force: true, transaction });
     };
 };

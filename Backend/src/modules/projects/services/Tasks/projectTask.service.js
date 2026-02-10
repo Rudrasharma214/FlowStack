@@ -102,4 +102,105 @@ export class ProjectTaskService {
             }
         }
     };
+
+    /* Get Task by ID */
+    async getTaskById(projectId, taskId) {
+        try {
+            const task = await projectTaskRepository.getTaskById(projectId, taskId);
+
+            if(!task) {
+                return {
+                    success: false,
+                    statusCode: STATUS.NOT_FOUND,
+                    message: 'Task not found',
+                    errors: null
+                };
+            }
+
+            return {
+                success: true,
+                statusCode: STATUS.OK,
+                message: 'Task fetched successfully',
+                data: task
+            };
+        } catch (error) {
+            return {
+                success: false,
+                statusCode: STATUS.INTERNAL_ERROR,
+                message: 'Failed to fetch task',
+                errors: error.message
+            }
+        }
+    };
+
+    /* Update Task */
+    async updateTask(projectId, taskId, userId, taskData) {
+        try {
+            const task = await projectTaskRepository.getTaskById(projectId, taskId);
+
+            if(!task) {
+                return {
+                    success: false,
+                    statusCode: STATUS.NOT_FOUND,
+                    message: 'Task not found',
+                    errors: null
+                };
+            };
+            const data = {
+                title: taskData.title || task.title,
+                description: taskData.description || task.description,
+                priority: taskData.priority || task.priority,
+                status: taskData.status || task.status,
+                completed_at: taskData.status === 'completed' ? new Date() : null,
+                due_date: taskData.due_date || task.due_date,
+                updated_by: userId
+            };
+            const updatedTask = await projectTaskRepository.updateTask(projectId, taskId, data);
+
+            return {
+                success: true,
+                statusCode: STATUS.OK,
+                message: 'Task updated successfully',
+                data: updatedTask
+            };
+        } catch (error) {
+            return {
+                success: false,
+                statusCode: STATUS.INTERNAL_ERROR,
+                message: 'Failed to update task',
+                errors: error.message
+            };
+        }
+    };
+
+    /* Delete Task */
+    async deleteTask(projectId, taskId) {
+        try {
+            const task = await projectTaskRepository.getTaskById(projectId, taskId);
+            if(!task) {
+                return {
+                    success: false,
+                    statusCode: STATUS.NOT_FOUND,
+                    message: 'Task not found',
+                    errors: null
+                };
+            }
+
+            await projectTaskRepository.deleteTask(projectId, taskId);
+
+            return {
+                success: true,
+                statusCode: STATUS.OK,
+                message: 'Task deleted successfully',
+                data: null
+            };
+        } catch (error) {
+            return {
+                success: false,
+                statusCode: STATUS.INTERNAL_ERROR,
+                message: 'Failed to delete task',
+                errors: error.message
+            }
+        }
+    };
 };
