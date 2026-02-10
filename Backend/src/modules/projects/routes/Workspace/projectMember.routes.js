@@ -47,4 +47,26 @@ projectMemberRoutes.post(
     projectMemberController.rejectInvitation
 );
 
+/**
+ * @route   GET /api/projects/:projectId/members
+ * @desc    Get a list of all members in the project
+ * @access  Protected (requires authentication)
+ */
+projectMemberRoutes.get(
+    '/',
+    authenticate,
+    projectMemberController.getProjectMembers
+);
+
+/**
+ * @route   DELETE /api/projects/:projectId/members/:memberId
+ * @desc    Remove a member from the project
+ * @access  Protected (requires authentication)
+ */
+projectMemberRoutes.delete(
+    '/:memberId',
+    authenticate,
+    projectMemberController.removeMember
+);
+
 export default projectMemberRoutes;

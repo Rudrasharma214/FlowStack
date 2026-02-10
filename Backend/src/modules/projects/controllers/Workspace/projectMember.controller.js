@@ -11,7 +11,6 @@ export class ProjectMemberController {
     };
 
     /* Invite an member */
-
     async inviteMember(req, res, next) {
         try {
             const { id: userId } = req.user;
@@ -39,7 +38,6 @@ export class ProjectMemberController {
         }
     }
 
-
     /* Verify a project invitation */
     async verifyInvitation(req, res, next) {
         try {
@@ -55,6 +53,7 @@ export class ProjectMemberController {
             next(error);
         }
     }
+
     /* Accept a project invitation */
     async acceptInvitation(req, res, next) {
         try {
@@ -81,6 +80,49 @@ export class ProjectMemberController {
 
             const result = await this.projectMemberService.rejectInvitation(
                 token
+            );
+
+            if (!result.success) {
+                return sendErrorResponse(res, result.statusCode, result.message, result.errors);
+            }
+
+            return sendResponse(res, STATUS.OK, result.message, result.data);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /* Get all members in a project */
+    async getProjectMembers(req, res, next) {
+        try {
+            const { projectId } = req.params;
+            const { page = 1, limit = 10, search = '' } = req.query;
+
+            const result = await this.projectMemberService.getProjectMembers({
+                projectId: parseInt(projectId),
+                page: parseInt(page),
+                limit: parseInt(limit),
+                search
+            });
+
+            if (!result.success) {
+                return sendErrorResponse(res, result.statusCode, result.message, result.errors);
+            }
+
+            return sendResponse(res, STATUS.OK, result.message, result.data);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    /* Remove a member from a project */
+    async removeMember(req, res, next) {
+        try {
+            const { projectId, memberId } = req.params;
+
+            const result = await this.projectMemberService.removeMember(
+                parseInt(projectId), 
+                parseInt(memberId)
             );
 
             if (!result.success) {

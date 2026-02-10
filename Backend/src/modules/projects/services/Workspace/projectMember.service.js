@@ -231,4 +231,90 @@ export class ProjectMemberService {
             };
         }
     };
+
+    /* Get all members in a project */
+    async getProjectMembers({ projectId, page, limit, search }) {
+        try {
+            const offset = (page - 1) * limit;
+
+            const whereClause = {
+                project_id: projectId
+            };
+
+            if (search) {
+                whereClause['$User.name$'] = { [sequelize.Op.iLike]: `%${search}%` };
+            }
+
+            const members = await projectMemberRepository.getProjectMembersByProjectId({
+                whereClause,
+                options: { offset, limit },
+                include: [
+                    {
+                        model: userRepository.model,
+                        as: 'User',
+                        attributes: ['id', 'name', 'email']
+                    }
+                ],
+                transaction: null
+            });
+
+            if(!members || members.count === 0) {
+                return {
+                    success: false,
+                    message: 'No members found for the project',
+                    statusCode: STATUS.NOT_FOUND
+                };
+            }
+
+            return {
+                success: true,
+                message: 'Project members retrieved successfully',
+                data: {
+                    members: members.rows,
+                    pagination: {
+                        total: members.count,
+                        page,
+                        limit,
+                        totalPages: Math.ceil(members.count / limit)
+                    }
+                },
+                statusCode: STATUS.OK
+            };
+        } catch (error) {
+            return {
+                success: false,
+                message: 'Failed to get project members',
+                errors: error.message,
+                statusCode: STATUS.INTERNAL_ERROR
+            };
+        }
+    };
+
+    /* Remove a member from a project */
+    async removeMember(projectId, memberId) {
+        try {
+            const result = await projectMemberRepository.removeProjectMember(projectId, memberId);
+
+            if (result === 0) {
+                return {
+                    success: false,
+                    message: 'Member not found in the project',
+                    statusCode: STATUS.NOT_FOUND
+                };
+            }
+
+            return {
+                success: true,
+                message: 'Member removed from the project successfully',
+                statusCode: STATUS.OK
+            };
+        } catch (error) {
+            return {
+                success: false,
+                message: 'Failed to remove member from the project',
+                errors: error.message,
+                statusCode: STATUS.INTERNAL_ERROR
+            };
+        }
+    };
 };

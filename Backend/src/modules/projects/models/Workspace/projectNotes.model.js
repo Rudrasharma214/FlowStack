@@ -9,38 +9,38 @@ const ProjectNotes = sequelize.define(
             primaryKey: true,
             autoIncrement: true,
             allowNull: false,
-            comment: 'Primary key for the ProjectNotes model',
+            comment: 'Primary key for the ProjectNotes model'
         },
 
         project_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            comment: 'Foreign key referencing the associated project',
+            comment: 'Foreign key referencing the associated project'
         },
 
         name: {
             type: DataTypes.STRING,
             allowNull: false,
-            comment: 'Name of the person who wrote the note',
+            comment: 'Name of the person who wrote the note'
         },
 
         note: {
             type: DataTypes.TEXT,
             allowNull: false,
-            comment: 'Content of the project note',
+            comment: 'Content of the project note'
         },
 
         created_by: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            comment: 'User ID of the person who created the note',
+            comment: 'User ID of the person who created the note'
         },
 
         updated_by: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            comment: 'User ID of the person who last updated the note',
-        },
+            comment: 'User ID of the person who last updated the note'
+        }
     },
     {
         tableName: 'project_notes',
@@ -48,7 +48,7 @@ const ProjectNotes = sequelize.define(
         indexes: [
             { fields: ['project_id', 'note'] },
             { fields: ['created_by'] },
-            { fields: ['updated_by'] },
+            { fields: ['updated_by'] }
         ]
     }
 );

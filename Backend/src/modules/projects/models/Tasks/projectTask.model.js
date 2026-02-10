@@ -9,75 +9,75 @@ const ProjectTask = sequelize.define(
             primaryKey: true,
             autoIncrement: true,
             allowNull: false,
-            comment: 'Primary key for the ProjectTask model',
+            comment: 'Primary key for the ProjectTask model'
         },
 
         project_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            comment: 'Foreign key referencing the associated project',
+            comment: 'Foreign key referencing the associated project'
         },
 
         parent_task_id: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            comment: 'Foreign key referencing the associated task',
+            comment: 'Foreign key referencing the associated task'
         },
 
         title: {
             type: DataTypes.STRING,
             allowNull: false,
-            comment: 'Title of the project task',
+            comment: 'Title of the project task'
         },
 
         description: {
             type: DataTypes.TEXT,
             allowNull: true,
-            comment: 'Detailed description of the project task',
+            comment: 'Detailed description of the project task'
         },
 
         priority: {
             type: DataTypes.ENUM('low', 'medium', 'high'),
             allowNull: false,
-            comment: 'Priority level of the project task',
+            comment: 'Priority level of the project task'
         },
 
         status: {
             type: DataTypes.ENUM('pending', 'in_progress', 'completed', 'dependent'),
             allowNull: false,
             defaultValue: 'pending',
-            comment: 'Current status of the project task',
+            comment: 'Current status of the project task'
         },
 
         assign_to: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            comment: 'User ID of the person assigned to the task',
+            comment: 'User ID of the person assigned to the task'
         },
 
         assigned_at: {
             type: DataTypes.DATE,
             allowNull: true,
-            comment: 'Timestamp when the task was assigned',
+            comment: 'Timestamp when the task was assigned'
         },
 
         assigned_by: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            comment: 'User ID of the person who assigned the task',
+            comment: 'User ID of the person who assigned the task'
         },
 
         due_date: {
             type: DataTypes.DATE,
             allowNull: true,
-            comment: 'Due date for the project task',
+            comment: 'Due date for the project task'
         },
 
         completed_at: {
             type: DataTypes.DATE,
             allowNull: true,
-            comment: 'Timestamp when the task was marked as completed',
-        },
+            comment: 'Timestamp when the task was marked as completed'
+        }
     },
     {
         tableName: 'project_tasks',
@@ -87,7 +87,7 @@ const ProjectTask = sequelize.define(
             { fields: ['priority'] },
             { fields: ['status'] },
             { fields: ['assign_to'] },
-            { fields: ['assigned_by'] },
+            { fields: ['assigned_by'] }
         ]
     }
 );
