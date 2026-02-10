@@ -13,8 +13,8 @@ export class ProjectTaskRepository {
     };
 
     /* Get Task by ID */
-    async getTaskById(projectId, taskId, transaction = null) {
-        return await ProjectTask.findOne({ where: { projectId, id: taskId }, transaction });
+    async getTaskById({whereClause, include = [], transaction = null}) {
+        return await ProjectTask.findOne({ where: whereClause, include, transaction });
     };
 
     /* Update Task */

@@ -1,10 +1,14 @@
-import { STATUS } from "../../../../core/constants/statusCodes.js";
-import { ProjectRepository } from "../../repositories/Workspace/project.repositories.js";
-import { ProjectTaskRepository } from "../../repositories/Tasks/proejctTask.repositories.js";
+import { STATUS } from '../../../../core/constants/statusCodes.js';
+import { ProjectRepository } from '../../repositories/Workspace/project.repositories.js';
+import { ProjectTaskRepository } from '../../repositories/Tasks/proejctTask.repositories.js';
+import { ProjectTaskDependenciesRepository } from '../../repositories/Tasks/projectTaskDependencies.repositories.js';
+import ProjectTaskDependencies from '../../models/Tasks/projectTaskDependencies.model.js';
+import User from '../../../../core/modules/auth/models/user.model.js';
+import ProjectTask from '../../models/Tasks/projectTask.model.js';
 
 const projectRepository = new ProjectRepository();
 const projectTaskRepository = new ProjectTaskRepository();
-
+const projectTaskDependenciesRepository = new ProjectTaskDependenciesRepository();
 export class ProjectTaskService {
 
     /* Create a new Task */
@@ -19,7 +23,7 @@ export class ProjectTaskService {
                     statusCode: STATUS.NOT_FOUND,
                     message: 'Project not found',
                     errors: null
-                }
+                };
             };
 
             const data = {
@@ -45,7 +49,7 @@ export class ProjectTaskService {
                 statusCode: STATUS.CREATED,
                 message: 'Task created successfully',
                 data: newTask
-            }
+            };
         } catch (error) {
             await transaction.rollback();
             return {
@@ -53,7 +57,7 @@ export class ProjectTaskService {
                 statusCode: STATUS.INTERNAL_ERROR,
                 message: 'Failed to create task',
                 errors: error.message
-            }
+            };
         }
     };
 
@@ -69,7 +73,7 @@ export class ProjectTaskService {
                     title: { [this.sequelize.Op.iLike]: `%${search}%` }
                 };
             }
-        
+
             const options = {
                 offset,
                 limit,
@@ -78,7 +82,7 @@ export class ProjectTaskService {
 
             const tasks = await projectTaskRepository.getTasks(whereClause, options);
 
-            if(tasks.length === 0) {
+            if (tasks.length === 0) {
                 return {
                     success: true,
                     statusCode: STATUS.OK,
@@ -99,16 +103,37 @@ export class ProjectTaskService {
                 statusCode: STATUS.INTERNAL_ERROR,
                 message: 'Failed to fetch tasks',
                 errors: error.message
-            }
+            };
         }
     };
 
     /* Get Task by ID */
     async getTaskById(projectId, taskId) {
         try {
-            const task = await projectTaskRepository.getTaskById(projectId, taskId);
+            const whereClause = { projectId, id: taskId };
 
-            if(!task) {
+            const task = await projectTaskRepository.getTaskById({
+                whereClause,
+                include: [
+                    {
+                        model: ProjectTask,
+                        as: 'subtasks'
+                    },
+                    {
+                        model: ProjectTaskDependencies,
+                        as: 'dependencies',
+                        include: [
+                            {
+                                model: User,
+                                as: 'createdBy',
+                                attributes: ['id', 'name', 'email']
+                            }
+                        ]
+                    }
+                ]
+            });
+
+            if (!task) {
                 return {
                     success: false,
                     statusCode: STATUS.NOT_FOUND,
@@ -129,16 +154,16 @@ export class ProjectTaskService {
                 statusCode: STATUS.INTERNAL_ERROR,
                 message: 'Failed to fetch task',
                 errors: error.message
-            }
+            };
         }
     };
 
     /* Update Task */
     async updateTask(projectId, taskId, userId, taskData) {
         try {
-            const task = await projectTaskRepository.getTaskById(projectId, taskId);
+            const task = await projectTaskRepository.getTaskById({ whereClause: { projectId, id: taskId } });
 
-            if(!task) {
+            if (!task) {
                 return {
                     success: false,
                     statusCode: STATUS.NOT_FOUND,
@@ -177,7 +202,7 @@ export class ProjectTaskService {
     async deleteTask(projectId, taskId) {
         try {
             const task = await projectTaskRepository.getTaskById(projectId, taskId);
-            if(!task) {
+            if (!task) {
                 return {
                     success: false,
                     statusCode: STATUS.NOT_FOUND,
@@ -200,7 +225,45 @@ export class ProjectTaskService {
                 statusCode: STATUS.INTERNAL_ERROR,
                 message: 'Failed to delete task',
                 errors: error.message
+            };
+        }
+    };
+
+    /* Add Dependencies to a Task */
+    async addDependencies(userId, projectId, taskId, dependentId, description) {
+        try {
+            const task = await projectTaskRepository.getTaskById(projectId, taskId);
+            if (!task) {
+                return {
+                    success: false,
+                    statusCode: STATUS.NOT_FOUND,
+                    message: 'Task not found',
+                    errors: null
+                };
             }
+
+            const data = {
+                project_task_id: taskId,
+                depends_on_task_id: dependentId,
+                description: description || null,
+                created_by: userId
+            };
+
+            const newDependency = await projectTaskDependenciesRepository.createTaskDependency(data);
+
+            return {
+                success: true,
+                statusCode: STATUS.OK,
+                message: 'Dependency added successfully',
+                data: newDependency
+            };
+        } catch (error) {
+            return {
+                success: false,
+                statusCode: STATUS.INTERNAL_ERROR,
+                message: 'Failed to add dependencies',
+                errors: error.message
+            };
         }
     };
 };

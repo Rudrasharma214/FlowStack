@@ -60,4 +60,14 @@ projectTaskRoutes.delete(
     projectTaskController.deleteTask
 );
 
+/**
+ * @route POST /api/projects/:projectId/tasks/:taskId/add
+ * @desc Add dependencies to a specific task
+ * @access Private
+ */
+projectTaskRoutes.post(
+    '/:taskId/add',
+    projectTaskController.addDependencies
+);
+
 export default projectTaskRoutes;

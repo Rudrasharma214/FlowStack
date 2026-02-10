@@ -99,7 +99,7 @@ export class ProjectTaskController {
         } catch (error) {
             next(error);
         }
-    }
+    };
 
     /* Delete Task */
     async deleteTask(req, res, next) {
@@ -108,7 +108,32 @@ export class ProjectTaskController {
 
             const result = await this.projectTaskService.deleteTask(
                 parseInt(projectId),
+                parseInt(taskId)
+            );
+
+            if (!result.success) {
+                return sendErrorResponse(res, result.statusCode, result.message, result.errors);
+            }
+
+            sendResponse(res, STATUS.OK, result.message, result.data);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    /* Add Dependencies to a Task */
+    async addDependencies(req, res, next) {
+        try {
+            const { id: userId } = req.user;
+            const { projectId, taskId } = req.params;
+            const { dependentId, description } = req.body;
+
+            const result = await this.projectTaskService.addDependencies(
+                parseInt(userId),
+                parseInt(projectId),
                 parseInt(taskId),
+                parseInt(dependentId),
+                description
             );
 
             if (!result.success) {
