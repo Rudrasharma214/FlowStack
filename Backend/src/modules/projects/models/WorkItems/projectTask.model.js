@@ -18,7 +18,7 @@ const ProjectTask = sequelize.define(
             comment: 'Foreign key referencing the associated project',
         },
 
-        task_id: {
+        parent_task_id: {
             type: DataTypes.INTEGER,
             allowNull: true,
             comment: 'Foreign key referencing the associated task',
