@@ -6,7 +6,7 @@ import { handleError } from '@/services/errorHandler';
 /**
  * Create Axios instance with default configuration
  */
-export const apiClient: AxiosInstance = axios.create({
+export const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   timeout: API_TIMEOUT,
   headers: {
@@ -17,7 +17,7 @@ export const apiClient: AxiosInstance = axios.create({
 /**
  * Request interceptor - Add auth token to headers
  */
-apiClient.interceptors.request.use(
+api.interceptors.request.use(
   config => {
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     if (token) {
@@ -31,7 +31,7 @@ apiClient.interceptors.request.use(
 /**
  * Response interceptor - Handle errors globally
  */
-apiClient.interceptors.response.use(
+api.interceptors.response.use(
   response => response,
   (error: AxiosError) => {
     const appError = handleError(error, 'API Request');
@@ -47,4 +47,4 @@ apiClient.interceptors.response.use(
   }
 );
 
-export default apiClient;
+export default api;

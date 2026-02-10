@@ -1,32 +1,90 @@
-import { apiClient } from '@/services/api/axiosInstance';
-import type { LoginCredentials, AuthResponse } from '../types';
-
-/**
- * Authentication service
- * Handle all auth-related API calls
- */
+import { api } from '@/services';     
+import type { 
+  changePasswordData,
+  loginCredentials,
+  registerCredentials,
+  resetPasswordData,
+  verifyLoginOtpData
+} from '../types/authService.types';
 
 export const authService = {
-  login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
-    return response.data;
+  signup: async (registerCredentials: registerCredentials) => {
+    try {
+      const response = await api.post('/auth/signup', registerCredentials);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
 
-  logout: async (): Promise<void> => {
-    await apiClient.post('/auth/logout');
+  verifyEmail: async (token: string) => {
+    try {
+      const response = await api.post('/auth/verify-email', token);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
 
-  register: async (data: {
-    email: string;
-    password: string;
-    name: string;
-  }): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/auth/register', data);
-    return response.data;
+  login: async (loginCredentials: loginCredentials) => {
+    try {
+      const response = await api.post('/auth/login', loginCredentials);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
 
-  verifyToken: async (token: string): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/auth/verify', { token });
-    return response.data;
+  verifyLogin: async (data: verifyLoginOtpData) => {
+    try {
+      const response = await api.post('/auth/verify-login', data);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   },
+
+  forgotPassword: async (email: string) => {
+    try {
+      const response = await api.post('/auth/forgot-password', { email });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  resetPassword: async (data: resetPasswordData) => {
+    try {
+      const response = await api.post('/auth/reset-password', data);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  changePassword: async (data: changePasswordData) => {
+    try {
+      const response = await api.post('/auth/change-password', data);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  refreshToken: async () => {
+    try {
+      const response = await api.post('/auth/refresh-token');
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  logout: async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch (error) {
+      throw error;
+    }
+  }
 };
