@@ -5,7 +5,7 @@ export class ProjectTaskController {
     constructor(projectTaskService) {   
         this.projectTaskService = projectTaskService;
         this.createTask = this.createTask.bind(this);
-        // this.getTasks = this.getTasks.bind(this);
+        this.getTasks = this.getTasks.bind(this);
         // this.getTaskById = this.getTaskById.bind(this);
         // this.updateTask = this.updateTask.bind(this);
         // this.deleteTask = this.deleteTask.bind(this);
@@ -31,6 +31,29 @@ export class ProjectTaskController {
             }
 
             sendResponse(res, STATUS.CREATED, result.message, result.data);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    /* Get All Tasks */
+    async getTasks(req, res, next) {
+        try {
+            const { projectId } = req.params;
+            const { page = 1, limit = 10, search = '' } = req.query;
+
+            const result = await this.projectTaskService.getTasks(
+                parseInt(projectId),
+                parseInt(page),
+                parseInt(limit),
+                search
+            );
+
+            if(!result.success) {
+                return sendErrorResponse(res, result.statusCode, result.message, result.errors);
+            }
+
+            sendResponse(res, STATUS.OK, result.message, result.data);
         } catch (error) {
             next(error);
         }
