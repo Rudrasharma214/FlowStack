@@ -1,23 +1,23 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext/useAuth';
 
-interface ProtectedRouteProps {
+interface OpenRouteProps {
   children: React.ReactNode;
 }
 
 /**
- * Protected route wrapper for authenticated pages
- * Redirects to login if user is not authenticated
+ * Open route wrapper for public pages (login, register)
+ * Redirects to dashboard if user is already authenticated
  */
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+export const OpenRoute: React.FC<OpenRouteProps> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
