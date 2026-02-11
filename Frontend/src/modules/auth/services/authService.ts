@@ -1,90 +1,54 @@
-import { api } from '@/services';     
-import type { 
+import { api } from '@/services';
+import type {
   changePasswordData,
   loginCredentials,
   registerCredentials,
   resetPasswordData,
-  verifyLoginOtpData
+  verifyLoginOtpData,
 } from '../types/authService.types';
 
 export const authService = {
   signup: async (registerCredentials: registerCredentials) => {
-    try {
-      const response = await api.post('/auth/signup', registerCredentials);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.post('/auth/signup', registerCredentials);
+    return response.data;
   },
 
   verifyEmail: async (token: string) => {
-    try {
-      const response = await api.post('/auth/verify-email', token);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.post('/auth/verify-email', token);
+    return response.data;
   },
 
   login: async (loginCredentials: loginCredentials) => {
-    try {
-      const response = await api.post('/auth/login', loginCredentials);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.post('/auth/login', loginCredentials);
+    return response.data;
   },
 
   verifyLogin: async (data: verifyLoginOtpData) => {
-    try {
-      const response = await api.post('/auth/verify-login', data);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.post('/auth/verify-login', data);
+    return response.data;
   },
 
   forgotPassword: async (email: string) => {
-    try {
-      const response = await api.post('/auth/forgot-password', { email });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.post('/auth/forgot-password', { email });
+    return response.data;
   },
 
   resetPassword: async (data: resetPasswordData) => {
-    try {
-      const response = await api.post('/auth/reset-password', data);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.post('/auth/reset-password', data);
+    return response.data;
   },
 
   changePassword: async (data: changePasswordData) => {
-    try {
-      const response = await api.post('/auth/change-password', data);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.post('/auth/change-password', data);
+    return response.data;
   },
 
   refreshToken: async () => {
-    try {
-      const response = await api.post('/auth/refresh-token');
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
+    const response = await api.post('/auth/refresh-token');
+    return response.data;
   },
 
   logout: async () => {
-    try {
-      await api.post('/auth/logout');
-    } catch (error) {
-      throw error;
-    }
-  }
+    await api.post('/auth/logout');
+  },
 };

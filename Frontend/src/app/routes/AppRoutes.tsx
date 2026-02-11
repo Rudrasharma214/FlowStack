@@ -1,21 +1,18 @@
-import React from 'react';
+import { createBrowserRouter } from 'react-router-dom';
+import type { RouteObject } from 'react-router-dom';
+import App from '../App';
+import { ErrorBoundary } from '../errorBoundry/errorBoundry';
 
-/**
- * Main application routes
- * Configure all routes here using react-router-dom
- * This file needs react-router-dom to be installed
- */
+import { authRoutes } from '../../modules/auth/routes';
+import { dashboardRoutes } from '../../modules/dashboard/routes';
+import { subscriptionRoutes } from '../../modules/subscription/routes';
 
-export const AppRoutes: React.FC = () => {
-  // TODO: Implement routes using react-router-dom
-  // Example:
-  // return (
-  //   <Routes>
-  //     <Route path="/" element={<Home />} />
-  //     <Route path="/auth/*" element={<AuthRoutes />} />
-  //     <Route path="/dashboard/*" element={<ProtectedRoute><DashboardRoutes /></ProtectedRoute>} />
-  //   </Routes>
-  // );
+const routes: RouteObject[] = [
+  {
+    element: <App />,
+    errorElement: <ErrorBoundary />,
+    children: [...authRoutes, ...dashboardRoutes, ...subscriptionRoutes],
+  },
+];
 
-  return <div>Routes not configured yet. Install react-router-dom and configure routes.</div>;
-};
+export const router = createBrowserRouter(routes);

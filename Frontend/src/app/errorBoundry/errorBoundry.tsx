@@ -3,7 +3,7 @@ import React from 'react';
 import { logger } from '@/services/logger';
 
 interface Props {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   fallback?: React.ReactNode;
 }
 

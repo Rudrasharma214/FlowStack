@@ -1,15 +1,13 @@
-
-
 export interface registerCredentials {
   name: string;
   email: string;
   password: string;
-};
+}
 
 export interface loginCredentials {
   email: string;
   password: string;
-};
+}
 
 export interface verifyLoginOtpData {
   userId: number;
