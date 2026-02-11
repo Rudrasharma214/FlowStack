@@ -1,6 +1,7 @@
 import express from 'express';
 import projectRoutes from './Workspace/project.routes.js';
 import projectMemberRouter from './Workspace/projectMember.routes.js';
+import projectTaskRoutes from './Tasks/projectTask.routes.js';
 
 const projectsRouter = express.Router();
 
@@ -10,6 +11,13 @@ const projectsRouter = express.Router();
  * @access  Protected (requires authentication)
  */
 projectsRouter.use('/:projectId/members', projectMemberRouter);
+
+/**
+ * @route   /api/projects/:projectId/tasks
+ * @desc    Router for managing project tasks (create/update/delete/list)
+ * @access  Protected (requires authentication)
+ */
+projectsRouter.use('/:projectId/tasks', projectTaskRoutes);
 
 /**
  * @route   /api/projects

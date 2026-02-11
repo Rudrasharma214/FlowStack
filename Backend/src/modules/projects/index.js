@@ -17,7 +17,9 @@ export { projectsRouter };
  * @description Initializes all database associations for the project module
  */
 import { WorkspaceAssociations } from './models/Workspace/associations.js';
+import { ProjectTaskAssociations } from './models/Tasks/associations.js';
 
 export const ProjectAssociations = () => {
   WorkspaceAssociations.associate();
+  ProjectTaskAssociations.associate();
 };

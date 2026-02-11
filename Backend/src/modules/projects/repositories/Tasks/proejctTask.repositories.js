@@ -8,12 +8,13 @@ export class ProjectTaskRepository {
 
   /* Get All Tasks */
   async getTasks(whereClause, options = {}, include = [], transaction = null) {
-    return await ProjectTask.findAll({
+    const { count, rows } = await ProjectTask.findAndCountAll({
       where: whereClause,
       ...options,
       include,
       transaction,
     });
+    return { count, rows };
   }
 
   /* Get Task by ID */
@@ -28,7 +29,7 @@ export class ProjectTaskRepository {
   /* Update Task */
   async updateTask(projectId, taskId, data, transaction = null) {
     return await ProjectTask.update(data, {
-      where: { projectId, id: taskId },
+      where: { project_id: projectId, id: taskId },
       transaction,
     });
   }
@@ -36,7 +37,7 @@ export class ProjectTaskRepository {
   /* Delete Task */
   async deleteTask(projectId, taskId, transaction = null) {
     return await ProjectTask.destroy({
-      where: { projectId, id: taskId },
+      where: { project_id: projectId, id: taskId },
       force: true,
       transaction,
     });

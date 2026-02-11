@@ -42,7 +42,7 @@ app.use(cookieParser());
 
 app.get('/', (req, res) => {
   sendResponse(res, STATUS.OK, 'Server is healthy', {
-    version: 'TMS-1.0',
+    version: 'FlowStack-1.0',
     ip: req.ip,
     healthy: true,
     requestedAt: new Date().toLocaleString('en-IN', {

@@ -6,6 +6,7 @@ import ProjectTaskDependencies from '../../models/Tasks/projectTaskDependencies.
 import User from '../../../../core/modules/auth/models/user.model.js';
 import ProjectTask from '../../models/Tasks/projectTask.model.js';
 import { sequelize } from '../../../../config/db.js';
+import { Op } from 'sequelize';
 
 const projectRepository = new ProjectRepository();
 const projectTaskRepository = new ProjectTaskRepository();
@@ -14,7 +15,7 @@ const projectTaskDependenciesRepository =
 export class ProjectTaskService {
   /* Create a new Task */
   async createTask(projectId, userId, taskData) {
-    const transaction = await this.sequelize.transaction();
+    const transaction = await sequelize.transaction();
     try {
       const project = await projectRepository.getProjectByPk(
         projectId,
@@ -31,15 +32,15 @@ export class ProjectTaskService {
       }
 
       const data = {
-        projectId,
+        project_id: projectId,
         parent_task_id: taskData.parent_task_id || null,
         title: taskData.title,
         description: taskData.description || null,
         priority: taskData.priority,
         status: taskData.status || 'pending',
         assign_to: taskData.assign_to || null,
-        assign_at: taskData.assign_to ? new Date() : null,
-        assign_by: userId,
+        assigned_at: taskData.assign_to ? new Date() : null,
+        assigned_by: userId,
         due_date: taskData.due_date || null,
         createdBy: userId,
       };
@@ -70,11 +71,11 @@ export class ProjectTaskService {
     try {
       const offset = (page - 1) * limit;
 
-      let whereClause = { projectId };
+      let whereClause = { project_id: projectId };
       if (search) {
         whereClause = {
           ...whereClause,
-          title: { [this.sequelize.Op.iLike]: `%${search}%` },
+          title: { [Op.like]: `%${search}%` },
         };
       }
 
@@ -99,7 +100,15 @@ export class ProjectTaskService {
         success: true,
         statusCode: STATUS.OK,
         message: 'Tasks fetched successfully',
-        data: tasks,
+        data: {
+          tasks: tasks.rows,
+          pagination: {
+            total: tasks.count,
+            page,
+            limit,
+            totalPages: Math.ceil(tasks.count / limit),
+          },
+        },
       };
     } catch (error) {
       return {
@@ -114,7 +123,7 @@ export class ProjectTaskService {
   /* Get Task by ID */
   async getTaskById(projectId, taskId) {
     try {
-      const whereClause = { projectId, id: taskId };
+      const whereClause = { project_id: projectId, id: taskId };
 
       const task = await projectTaskRepository.getTaskById({
         whereClause,
@@ -122,6 +131,16 @@ export class ProjectTaskService {
           {
             model: ProjectTask,
             as: 'subtasks',
+          },
+          {
+            model: User,
+            as: 'assignedTo',
+            attributes: ['id', 'name', 'email'],
+          },
+          {
+            model: User,
+            as: 'assignedBy',
+            attributes: ['id', 'name', 'email'],
           },
           {
             model: ProjectTaskDependencies,
@@ -166,7 +185,7 @@ export class ProjectTaskService {
   async updateTask(projectId, taskId, userId, taskData) {
     try {
       const task = await projectTaskRepository.getTaskById({
-        whereClause: { projectId, id: taskId },
+        whereClause: { project_id: projectId, id: taskId },
       });
 
       if (!task) {
@@ -182,7 +201,9 @@ export class ProjectTaskService {
         description: taskData.description || task.description,
         priority: taskData.priority || task.priority,
         status: taskData.status || task.status,
-        completed_at: taskData.status === 'completed' ? new Date() : null,
+        assign_to: taskData.assign_to || task.assign_to,
+        assigned_at: taskData.assign_to ? new Date() : task.assigned_at,
+        completed_at: taskData.status === 'completed' ? new Date() : task.completed_at,
         due_date: taskData.due_date || task.due_date,
         updated_by: userId,
       };
@@ -211,7 +232,8 @@ export class ProjectTaskService {
   /* Delete Task */
   async deleteTask(projectId, taskId) {
     try {
-      const task = await projectTaskRepository.getTaskById(projectId, taskId);
+      const whereClause = { project_id: projectId, id: taskId };
+      const task = await projectTaskRepository.getTaskById({ whereClause });
       if (!task) {
         return {
           success: false,
@@ -242,7 +264,8 @@ export class ProjectTaskService {
   /* Add Dependencies to a Task */
   async addDependencies(userId, projectId, taskId, dependentId, description) {
     try {
-      const task = await projectTaskRepository.getTaskById(projectId, taskId);
+      const whereClause = { project_id: projectId, id: taskId };
+      const task = await projectTaskRepository.getTaskById({ whereClause });
       if (!task) {
         return {
           success: false,
@@ -282,11 +305,8 @@ export class ProjectTaskService {
   async removeDependencies(projectId, taskId, dependencyId) {
     const transaction = await sequelize.transaction();
     try {
-      const task = await projectTaskRepository.getTaskById(
-        projectId,
-        taskId,
-        transaction
-      );
+      const whereClause = { project_id: projectId, id: taskId };
+      const task = await projectTaskRepository.getTaskById({ whereClause, transaction });
       if (!task) {
         await transaction.rollback();
         return {

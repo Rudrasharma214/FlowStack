@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticate } from '../../../../core/modules/auth/middlewares/auth.middleware.js';
-import { ProjectTaskController } from '../controllers/Tasks/projectTask.controller.js';
+import { ProjectTaskController } from '../../controllers/Tasks/projectTask.controller.js';
 import { ProjectTaskService } from '../../services/Tasks/projectTask.service.js';
 
 const projectTaskService = new ProjectTaskService();
