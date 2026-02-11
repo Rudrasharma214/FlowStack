@@ -477,4 +477,39 @@ export class AuthService {
       };
     }
   }
+
+  /* GetProfile */
+  async getProfile(userId) {
+    try {
+      const user = await userRepository.findById(userId);
+      if (!user) {
+        return {
+          success: false,
+          message: 'User not found.',
+          statusCode: STATUS.NOT_FOUND,
+        };
+      }
+
+      const profile = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        profilePicture: user.profilePicture,
+      }
+
+      return {
+        success: true,
+        message: 'Profile fetched successfully.',
+        data: profile,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'An error occurred while fetching profile.',
+        statusCode: STATUS.INTERNAL_ERROR,
+        errors: error.message,
+      }
+    }
+  };
 }

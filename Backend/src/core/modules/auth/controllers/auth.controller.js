@@ -14,6 +14,7 @@ export class AuthController {
     this.changePassword = this.changePassword.bind(this);
     this.refreshToken = this.refreshToken.bind(this);
     this.logout = this.logout.bind(this);
+    this.getProfile = this.getProfile.bind(this);
   }
 
   /* Signup */
@@ -101,7 +102,6 @@ export class AuthController {
   }
 
   /* VerifyLoginOTP */
-
   async verifyLoginOTP(req, res, next) {
     try {
       const { userId, otp } = req.body;
@@ -262,4 +262,26 @@ export class AuthController {
       next(error);
     }
   }
+
+  /* GetProfile */
+  async getProfile(req, res, next) {
+    try {
+      const userId = req.user.id;
+
+      const result = await this.authService.getProfile(userId);
+
+      if (!result.success) {
+        return sendErrorResponse(
+          res,
+          result.statusCode,
+          result.message,
+          result.error
+        );
+      }
+
+      sendResponse(res, STATUS.OK, result.message, result.data);
+    } catch (error) {
+      next(error);
+    }
+  };
 }

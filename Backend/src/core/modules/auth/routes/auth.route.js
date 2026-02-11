@@ -102,4 +102,11 @@ authRouter.post('/refresh-token', authController.refreshToken);
  */
 authRouter.post('/logout', authenticate, authController.logout);
 
+/**
+ * @route GET /auth/profile
+ * @desc Get user profile
+ * @access Private
+ */
+authRouter.get('/profile', authenticate, authController.getProfile);
+
 export default authRouter;
