@@ -12,5 +12,5 @@ export const RootRedirect = () => {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
-  return <Navigate to={isAuthenticated ? '/dashboard' : '/login'} replace />;
+  return <Navigate to={isAuthenticated ? '/dashboard' : '/welcome'} replace />;
 };
