@@ -5,6 +5,7 @@ import { ProjectTaskDependenciesRepository } from '../../repositories/Tasks/proj
 import ProjectTaskDependencies from '../../models/Tasks/projectTaskDependencies.model.js';
 import User from '../../../../core/modules/auth/models/user.model.js';
 import ProjectTask from '../../models/Tasks/projectTask.model.js';
+import { sequelize } from '../../../../config/db.js';
 
 const projectRepository = new ProjectRepository();
 const projectTaskRepository = new ProjectTaskRepository();
@@ -262,6 +263,51 @@ export class ProjectTaskService {
                 success: false,
                 statusCode: STATUS.INTERNAL_ERROR,
                 message: 'Failed to add dependencies',
+                errors: error.message
+            };
+        }
+    };
+
+    /* Remove Dependencies from a Task */
+    async removeDependencies(projectId, taskId, dependencyId) {
+        const transaction = await sequelize.transaction();
+        try {
+            const task = await projectTaskRepository.getTaskById(projectId, taskId, transaction);
+            if (!task) {
+                await transaction.rollback();
+                return {
+                    success: false,
+                    statusCode: STATUS.NOT_FOUND,
+                    message: 'Task not found',
+                    errors: null
+                };
+            };
+
+            const dependency = await projectTaskDependenciesRepository.getTaskDependenciesByDependencyId(dependencyId, transaction);
+            if (!dependency) {
+                await transaction.rollback();
+                return {
+                    success: false,
+                    statusCode: STATUS.NOT_FOUND,
+                    message: 'Dependency not found',
+                    errors: null
+                };
+            };
+
+            await projectTaskDependenciesRepository.removeTaskDependency(dependencyId,  transaction);
+            await transaction.commit();
+            return {
+                success: true,
+                statusCode: STATUS.OK,
+                message: 'Dependency removed successfully',
+                data: null
+            };
+        } catch (error) {
+            await transaction.rollback();
+            return {
+                success: false,
+                statusCode: STATUS.INTERNAL_ERROR,
+                message: 'Failed to remove dependencies',
                 errors: error.message
             };
         }

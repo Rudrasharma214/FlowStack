@@ -70,4 +70,14 @@ projectTaskRoutes.post(
     projectTaskController.addDependencies
 );
 
+/**
+ * @route POST /api/projects/:projectId/tasks/:taskId/remove/:dependencyId
+ * @desc Remove dependencies from a specific task
+ * @access Private
+ */
+projectTaskRoutes.post(
+    '/:taskId/remove/:dependencyId',
+    projectTaskController.removeDependencies
+);
+
 export default projectTaskRoutes;

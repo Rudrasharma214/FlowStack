@@ -9,6 +9,8 @@ export class ProjectTaskController {
         this.getTaskById = this.getTaskById.bind(this);
         this.updateTask = this.updateTask.bind(this);
         this.deleteTask = this.deleteTask.bind(this);
+        this.addDependencies = this.addDependencies.bind(this);
+        this.removeDependencies = this.removeDependencies.bind(this);
     }
 
     /* Create a new Task */
@@ -137,6 +139,27 @@ export class ProjectTaskController {
             );
 
             if (!result.success) {
+                return sendErrorResponse(res, result.statusCode, result.message, result.errors);
+            }
+
+            sendResponse(res, STATUS.OK, result.message, result.data);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    /* Remove Dependencies from a Task */
+    async removeDependencies(req, res, next) {
+        try {
+            const { projectId, taskId, dependencyId } = req.params;
+
+            const result = await this.projectTaskService.removeDependencies(
+                parseInt(projectId),
+                parseInt(taskId),
+                parseInt(dependencyId)
+            );
+
+            if(!result.success) {
                 return sendErrorResponse(res, result.statusCode, result.message, result.errors);
             }
 
