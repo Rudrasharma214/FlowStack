@@ -3,18 +3,17 @@ import { AuthController } from '../controllers/auth.controller.js';
 import { AuthService } from '../services/auth.service.js';
 import { authenticate } from '../middlewares/auth.middleware.js';
 import { validate } from '../../../middlewares/validate.middleware.js';
-import { 
-    changePasswordSchema,
-    forgotPasswordSchema,
-    loginSchema, 
-    registerSchema, 
-    resetPasswordSchema, 
-    verifyEmailSchema,
-    verifyLoginOTPschema
+import {
+  changePasswordSchema,
+  forgotPasswordSchema,
+  loginSchema,
+  registerSchema,
+  resetPasswordSchema,
+  verifyEmailSchema,
+  verifyLoginOTPschema,
 } from '../validations/user.schema.js';
 
 const authRouter = express.Router();
-
 
 const authService = new AuthService();
 const authController = new AuthController(authService);
@@ -24,21 +23,17 @@ const authController = new AuthController(authService);
  * @desc User signup
  * @access Public
  */
-authRouter.post(
-    '/signup', 
-    validate(registerSchema),
-    authController.signup
-);
+authRouter.post('/signup', validate(registerSchema), authController.signup);
 
-/** 
+/**
  * @route POST /auth/verify-email
  * @desc Verify user email
  * @access Public
  */
 authRouter.post(
-    '/verify-email', 
-    validate(verifyEmailSchema),
-    authController.verifyEmail
+  '/verify-email',
+  validate(verifyEmailSchema),
+  authController.verifyEmail
 );
 
 /**
@@ -46,11 +41,7 @@ authRouter.post(
  * @desc User login
  * @access Public
  */
-authRouter.post(
-    '/login', 
-    validate(loginSchema),
-    authController.login
-);
+authRouter.post('/login', validate(loginSchema), authController.login);
 
 /**
  * @route POST /auth/verify-login
@@ -58,20 +49,20 @@ authRouter.post(
  * @access Public
  */
 authRouter.post(
-    '/verify-login', 
-    validate(verifyLoginOTPschema),
-    authController.verifyLoginOTP
+  '/verify-login',
+  validate(verifyLoginOTPschema),
+  authController.verifyLoginOTP
 );
 
-/** 
+/**
  * @route POST /auth/forgot-password
  * @desc Forgot password
  * @access Public
  */
 authRouter.post(
-    '/forgot-password',
-    validate(forgotPasswordSchema),
-    authController.forgotPassword
+  '/forgot-password',
+  validate(forgotPasswordSchema),
+  authController.forgotPassword
 );
 
 /**
@@ -80,9 +71,9 @@ authRouter.post(
  * @access Public
  */
 authRouter.post(
-    '/reset-password', 
-    validate(resetPasswordSchema),
-    authController.resetPassword
+  '/reset-password',
+  validate(resetPasswordSchema),
+  authController.resetPassword
 );
 
 /**
@@ -91,31 +82,24 @@ authRouter.post(
  * @access Private
  */
 authRouter.post(
-    '/change-password', 
-    authenticate, 
-    validate(changePasswordSchema),
-    authController.changePassword
+  '/change-password',
+  authenticate,
+  validate(changePasswordSchema),
+  authController.changePassword
 );
 
-/** 
+/**
  * @route POST /auth/refresh-token
  * @desc Refresh access token
  * @access Private
  */
-authRouter.post(
-    '/refresh-token',
-    authController.refreshToken
-);
+authRouter.post('/refresh-token', authController.refreshToken);
 
-/** 
+/**
  * @route POST /auth/logout
  * @desc User logout
  * @access Private
  */
-authRouter.post(
-    '/logout', 
-    authenticate, 
-    authController.logout
-);
+authRouter.post('/logout', authenticate, authController.logout);
 
 export default authRouter;

@@ -8,75 +8,81 @@ module.exports = {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-        allowNull: false
+        allowNull: false,
       },
       user_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'users',
-          key: 'id'
+          key: 'id',
         },
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
       },
       plan_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
           model: 'plans',
-          key: 'id'
+          key: 'id',
         },
-        onDelete: 'CASCADE'
+        onDelete: 'CASCADE',
       },
       start_date: {
         type: Sequelize.DATE,
-        allowNull: false
+        allowNull: false,
       },
       end_date: {
         type: Sequelize.DATE,
-        allowNull: false
+        allowNull: false,
       },
       is_active: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: true
+        defaultValue: true,
       },
       cancelled_at: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
       auto_renew: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: true
+        defaultValue: true,
       },
       renewed_at: {
         type: Sequelize.DATE,
-        allowNull: true
+        allowNull: true,
       },
       billing_cycle: {
         type: Sequelize.ENUM('monthly', 'yearly'),
-        allowNull: false
+        allowNull: false,
       },
       status: {
-        type: Sequelize.ENUM('active', 'inactive', 'cancelled', 'expired', 'paused'),
+        type: Sequelize.ENUM(
+          'active',
+          'inactive',
+          'cancelled',
+          'expired',
+          'paused'
+        ),
         allowNull: false,
-        defaultValue: 'inactive'
+        defaultValue: 'inactive',
       },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       updated_at: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       deleted_at: {
         type: Sequelize.DATE,
-        allowNull: true
-      }
+        allowNull: true,
+      },
     });
 
     // Create indexes
@@ -88,5 +94,5 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('subscriptions');
-  }
+  },
 };

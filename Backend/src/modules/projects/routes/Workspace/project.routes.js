@@ -1,7 +1,10 @@
 import express from 'express';
 import { authenticate } from '../../../../core/modules/auth/middlewares/auth.middleware.js';
 import { validate } from '../../../../core/middlewares/validate.middleware.js';
-import { createProjectSchema, updateProjectSchema } from '../../validations/Workspace/project.schema.js';
+import {
+  createProjectSchema,
+  updateProjectSchema,
+} from '../../validations/Workspace/project.schema.js';
 import { ProjectService } from '../../services/Workspace/project.service.js';
 import { ProjectController } from '../../controllers/Workspace/project.controller.js';
 
@@ -22,9 +25,9 @@ projectRoutes.use(authenticate);
  * @access  Protected (requires authentication)
  */
 projectRoutes.post(
-    '/',
-    validate(createProjectSchema),
-    projectController.createProject
+  '/',
+  validate(createProjectSchema),
+  projectController.createProject
 );
 
 /**
@@ -32,20 +35,14 @@ projectRoutes.post(
  * @desc    Get all projects for the authenticated user
  * @access  Protected (requires authentication)
  */
-projectRoutes.get(
-    '/',
-    projectController.getAllProjects
-);
+projectRoutes.get('/', projectController.getAllProjects);
 
 /**
  * @route   /api/projects/:projectId
  * @desc    Get project details by ID
  * @access  Protected (requires authentication)
  */
-projectRoutes.get(
-    '/:projectId',
-    projectController.getProjectById
-);
+projectRoutes.get('/:projectId', projectController.getProjectById);
 
 /**
  * @route   /api/projects/:projectId
@@ -53,9 +50,9 @@ projectRoutes.get(
  * @access  Protected (requires authentication)
  */
 projectRoutes.put(
-    '/:projectId',
-    validate(updateProjectSchema),
-    projectController.updateProject
+  '/:projectId',
+  validate(updateProjectSchema),
+  projectController.updateProject
 );
 
 /**
@@ -63,9 +60,6 @@ projectRoutes.put(
  * @desc    Delete a project by ID
  * @access  Protected (requires authentication)
  */
-projectRoutes.delete(
-    '/:projectId',
-    projectController.deleteProject
-);
+projectRoutes.delete('/:projectId', projectController.deleteProject);
 
 export default projectRoutes;

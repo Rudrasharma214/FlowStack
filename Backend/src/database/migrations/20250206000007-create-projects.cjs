@@ -9,63 +9,63 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
         allowNull: false,
-        comment: 'Primary key for the project'
+        comment: 'Primary key for the project',
       },
       name: {
         type: Sequelize.STRING,
         allowNull: false,
-        comment: 'Name of the project'
+        comment: 'Name of the project',
       },
       description: {
         type: Sequelize.TEXT,
         allowNull: true,
-        comment: 'Description of the project'
+        comment: 'Description of the project',
       },
       status: {
         type: Sequelize.ENUM('active', 'inactive', 'in_progress', 'completed'),
         allowNull: false,
         defaultValue: 'inactive',
-        comment: 'Status of the project'
+        comment: 'Status of the project',
       },
       start_date: {
         type: Sequelize.DATE,
         allowNull: true,
-        comment: 'Start date of the project'
+        comment: 'Start date of the project',
       },
       end_date: {
         type: Sequelize.DATE,
         allowNull: true,
-        comment: 'End date of the project'
+        comment: 'End date of the project',
       },
       completed_at: {
         type: Sequelize.DATE,
         allowNull: true,
-        comment: 'Timestamp when the project was marked as completed'
+        comment: 'Timestamp when the project was marked as completed',
       },
       created_by: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        comment: 'Owner ID of the user who created the project'
+        comment: 'Owner ID of the user who created the project',
       },
       updated_by: {
         type: Sequelize.INTEGER,
         allowNull: true,
-        comment: 'User ID of the last user who updated the project'
+        comment: 'User ID of the last user who updated the project',
       },
       created_at: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       updated_at: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
       deleted_at: {
         type: Sequelize.DATE,
-        allowNull: true
-      }
+        allowNull: true,
+      },
     });
 
     // Create indexes
@@ -76,5 +76,5 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('projects');
-  }
+  },
 };

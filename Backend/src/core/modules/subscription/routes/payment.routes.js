@@ -15,20 +15,16 @@ const paymentController = new PaymentController(paymentService);
  * Path : /api/subscriptions/payments/create-order
  */
 paymentRoutes.post(
-    '/create-order', 
-    authenticate, 
-    validate(createPaymentOrderSchema),
-    paymentController.createPaymentOrder
+  '/create-order',
+  authenticate,
+  validate(createPaymentOrderSchema),
+  paymentController.createPaymentOrder
 );
 
 /**
  * Razorpay Webhook Handler
  * Path : /api/subscriptions/payments/webhook
  */
-paymentRoutes.post(
-    '/webhook', 
-    paymentController.handleWebhook
-);
-
+paymentRoutes.post('/webhook', paymentController.handleWebhook);
 
 export default paymentRoutes;

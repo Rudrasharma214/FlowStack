@@ -4,25 +4,25 @@ import Payment from './payment.model.js';
 import User from '../../auth/models/user.model.js';
 
 export class SubscriptionAssociations {
-    static associate() {
-        // Subscription belongs to User
-        Subscription.belongsTo(User, {
-            foreignKey: 'user_id',
-            as: 'user'
-        });
+  static associate() {
+    // Subscription belongs to User
+    Subscription.belongsTo(User, {
+      foreignKey: 'user_id',
+      as: 'user',
+    });
 
-        // Subscription belongs to Plan
-        Subscription.belongsTo(Plan, {
-            foreignKey: 'plan_id',
-            as: 'plan'
-        });
+    // Subscription belongs to Plan
+    Subscription.belongsTo(Plan, {
+      foreignKey: 'plan_id',
+      as: 'plan',
+    });
 
-        // Subscription has many Payments
-        Subscription.hasMany(Payment, {
-            foreignKey: 'subscription_id',
-            as: 'payments'
-        });
-    }
+    // Subscription has many Payments
+    Subscription.hasMany(Payment, {
+      foreignKey: 'subscription_id',
+      as: 'payments',
+    });
+  }
 }
 
 // Initialize associations

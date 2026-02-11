@@ -15,60 +15,42 @@ projectTaskRoutes.use(authenticate);
  * @desc Create a new task for a project
  * @access Private
  */
-projectTaskRoutes.post(
-    '/',
-    projectTaskController.createTask
-);
+projectTaskRoutes.post('/', projectTaskController.createTask);
 
 /**
  * @route GET /api/projects/:projectId/tasks
  * @desc Get all tasks for a project
  * @access Private
  */
-projectTaskRoutes.get(
-    '/',
-    projectTaskController.getTasks
-);
+projectTaskRoutes.get('/', projectTaskController.getTasks);
 
 /**
  * @route GET /api/projects/:projectId/tasks/:taskId
  * @desc Get a specific task by ID
  * @access Private
  */
-projectTaskRoutes.get(
-    '/:taskId',
-    projectTaskController.getTaskById
-);
+projectTaskRoutes.get('/:taskId', projectTaskController.getTaskById);
 
 /**
  * @route PUT /api/projects/:projectId/tasks/:taskId
  * @desc Update a specific task by ID
- * @access Private  
+ * @access Private
  */
-projectTaskRoutes.put(
-    '/:taskId',
-    projectTaskController.updateTask
-);
+projectTaskRoutes.put('/:taskId', projectTaskController.updateTask);
 
 /**
  * @route DELETE /api/projects/:projectId/tasks/:taskId
  * @desc Delete a specific task by ID
  * @access Private
  */
-projectTaskRoutes.delete(
-    '/:taskId',
-    projectTaskController.deleteTask
-);
+projectTaskRoutes.delete('/:taskId', projectTaskController.deleteTask);
 
 /**
  * @route POST /api/projects/:projectId/tasks/:taskId/add
  * @desc Add dependencies to a specific task
  * @access Private
  */
-projectTaskRoutes.post(
-    '/:taskId/add',
-    projectTaskController.addDependencies
-);
+projectTaskRoutes.post('/:taskId/add', projectTaskController.addDependencies);
 
 /**
  * @route POST /api/projects/:projectId/tasks/:taskId/remove/:dependencyId
@@ -76,8 +58,8 @@ projectTaskRoutes.post(
  * @access Private
  */
 projectTaskRoutes.post(
-    '/:taskId/remove/:dependencyId',
-    projectTaskController.removeDependencies
+  '/:taskId/remove/:dependencyId',
+  projectTaskController.removeDependencies
 );
 
 export default projectTaskRoutes;

@@ -6,7 +6,9 @@ import { ProjectMemberController } from '../../controllers/Workspace/projectMemb
 import { ProjectMemberService } from '../../services/Workspace/projectMember.service.js';
 
 const projectMemberService = new ProjectMemberService();
-const projectMemberController = new ProjectMemberController(projectMemberService);
+const projectMemberController = new ProjectMemberController(
+  projectMemberService
+);
 
 const projectMemberRoutes = express.Router({ mergeParams: true });
 
@@ -16,15 +18,15 @@ const projectMemberRoutes = express.Router({ mergeParams: true });
  * @access  Protected (requires authentication)
  */
 projectMemberRoutes.post(
-    '/invite',
-    authenticate,
-    validate(projectMemberInviteSchema),
-    projectMemberController.inviteMember
+  '/invite',
+  authenticate,
+  validate(projectMemberInviteSchema),
+  projectMemberController.inviteMember
 );
 
 projectMemberRoutes.post(
-    '/verify-invitation',
-    projectMemberController.verifyInvitation
+  '/verify-invitation',
+  projectMemberController.verifyInvitation
 );
 
 /**
@@ -33,8 +35,8 @@ projectMemberRoutes.post(
  * @access  Protected (requires authentication)
  */
 projectMemberRoutes.post(
-    '/accept-invitation',
-    projectMemberController.acceptInvitation
+  '/accept-invitation',
+  projectMemberController.acceptInvitation
 );
 
 /**
@@ -43,8 +45,8 @@ projectMemberRoutes.post(
  * @access  Protected (requires authentication)
  */
 projectMemberRoutes.post(
-    '/reject-invitation', 
-    projectMemberController.rejectInvitation
+  '/reject-invitation',
+  projectMemberController.rejectInvitation
 );
 
 /**
@@ -53,9 +55,9 @@ projectMemberRoutes.post(
  * @access  Protected (requires authentication)
  */
 projectMemberRoutes.get(
-    '/',
-    authenticate,
-    projectMemberController.getProjectMembers
+  '/',
+  authenticate,
+  projectMemberController.getProjectMembers
 );
 
 /**
@@ -64,9 +66,9 @@ projectMemberRoutes.get(
  * @access  Protected (requires authentication)
  */
 projectMemberRoutes.delete(
-    '/:memberId',
-    authenticate,
-    projectMemberController.removeMember
+  '/:memberId',
+  authenticate,
+  projectMemberController.removeMember
 );
 
 export default projectMemberRoutes;

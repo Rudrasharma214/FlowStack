@@ -19,5 +19,5 @@ export { projectsRouter };
 import { WorkspaceAssociations } from './models/Workspace/associations.js';
 
 export const ProjectAssociations = () => {
-    WorkspaceAssociations.associate();
+  WorkspaceAssociations.associate();
 };

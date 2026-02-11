@@ -8,6 +8,8 @@
     "start": "node src/server.mjs",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
+    "format": "prettier --write \"src/**/*.{js,mjs,cjs,json}\"",
+    "format:check": "prettier --check \"src/**/*.{js,mjs,cjs,json}\"",
     "migrate": "sequelize-cli db:migrate --config src/config/sequelize-cli.cjs",
     "migrate:undo": "sequelize-cli db:migrate:undo --config src/config/sequelize-cli.cjs"
   },
@@ -32,6 +34,7 @@
     "@eslint/js": "^9.39.2",
     "eslint": "^9.39.2",
     "nodemon": "^3.1.11",
+    "prettier": "^3.8.1",
     "sequelize-cli": "^6.6.5"
   }
 }

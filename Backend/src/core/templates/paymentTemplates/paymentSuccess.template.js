@@ -1,15 +1,15 @@
 import { emailLayout } from '../../../config/emailTemplate.js';
 
 export const sendPaymentSuccessEmailTemplate = ({
-    transactionId,
-    planName,
-    name,
-    amount,
-    startDate,
-    endDate,
-    billingCycle
+  transactionId,
+  planName,
+  name,
+  amount,
+  startDate,
+  endDate,
+  billingCycle,
 }) => {
-    const body = `
+  const body = `
 
 <!-- ================= TITLE ================= -->
 <tr>
@@ -136,8 +136,8 @@ If you have any questions about your subscription or billing, simply reply to th
 
 `;
 
-    return emailLayout({
-        title: 'Payment Successful',
-        body
-    });
+  return emailLayout({
+    title: 'Payment Successful',
+    body,
+  });
 };
