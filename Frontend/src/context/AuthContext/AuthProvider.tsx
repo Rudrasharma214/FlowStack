@@ -1,22 +1,23 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
-import type { AuthContextType, User } from './AuthContext';
+import type { AuthContextType } from './AuthContext';
 import { AuthContext } from './AuthContext';
 import { logger } from '@/services';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   useLoginMutation,
   useSignupMutation,
   useLogoutMutation,
 } from '@/modules/auth/hooks/useMutationHooks/useMutate';
-import { AUTH_TOKEN_KEY } from '@/shared';
+import { useGetUser } from '@/modules/auth/hooks/useQueriesHooks/useQuery';
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const [token, setTokenState] = useState(() => localStorage.getItem('accessToken'));
   const [error, setError] = useState<string | null>(null);
 
   // Mutation hooks
@@ -24,23 +25,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const signupMutation = useSignupMutation();
   const logoutMutation = useLogoutMutation();
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const token = localStorage.getItem(AUTH_TOKEN_KEY);
-        if (token) {
-          logger.info('Initializing auth with existing token');
-          // Verify token and get user data from your backend
-        }
-      } catch (err) {
-        logger.error('Failed to initialize auth:', err);
-        localStorage.removeItem(AUTH_TOKEN_KEY);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // Fetch user ONLY if token exists
+  const { data, isLoading, isError, error: queryError } = useGetUser({
+    enabled: Boolean(token),
+  });
 
-    initializeAuth();
+  const user = data?.data || data?.user || data || null;
+  const isAuthenticated = Boolean(token && user);
+
+  const setAccessToken = useCallback((newToken: string) => {
+    localStorage.setItem('accessToken', newToken);
+    setTokenState(newToken);
+    setError(null);
+    queryClient.invalidateQueries({ queryKey: ['user'] });
+  }, [queryClient]);
+
+  const getAccessToken = useCallback(() => {
+    return localStorage.getItem('accessToken');
   }, []);
 
   const login = useCallback(
@@ -50,8 +51,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         logger.info(`Login attempt for email: ${email}`);
         const response = await loginMutation.mutateAsync({ email, password });
 
-        localStorage.setItem(AUTH_TOKEN_KEY, response.token);
-        setUser(response.user);
+        setAccessToken(response.token);
         logger.info('Login successful');
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Login failed';
@@ -60,67 +60,85 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         throw err;
       }
     },
-    [loginMutation]
+    [loginMutation, setAccessToken]
   );
 
   const register = useCallback(
     async (email: string, password: string, name: string) => {
       setError(null);
       try {
-        logger.info(`Registration attempt for email: ${email}`);
         const response = await signupMutation.mutateAsync({ email, password, name });
 
-        localStorage.setItem(AUTH_TOKEN_KEY, response.token);
-        setUser(response.user);
-        logger.info('Registration successful');
+        setAccessToken(response.token);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Registration failed';
         setError(errorMessage);
-        logger.error('Registration error:', err);
         throw err;
       }
     },
-    [signupMutation]
+    [signupMutation, setAccessToken]
   );
 
   const logout = useCallback(async () => {
     setError(null);
     try {
-      logger.info('User logout');
       await logoutMutation.mutateAsync();
 
-      localStorage.removeItem(AUTH_TOKEN_KEY);
-      setUser(null);
-      logger.info('Logout successful');
+      localStorage.removeItem('accessToken');
+      setTokenState(null);
+      queryClient.clear();
     } catch (err) {
-      logger.error('Logout error:', err);
-      // Still clear local auth even if logout request fails
-      localStorage.removeItem(AUTH_TOKEN_KEY);
-      setUser(null);
+      localStorage.removeItem('accessToken');
+      setTokenState(null);
+      queryClient.clear();
       throw err;
     }
-  }, [logoutMutation]);
+  }, [logoutMutation, queryClient]);
 
   const clearError = useCallback(() => {
     setError(null);
   }, []);
 
-  const value: AuthContextType = {
-    user,
-    isAuthenticated: !!user,
-    isLoading:
-      loginMutation.isPending || signupMutation.isPending || logoutMutation.isPending || isLoading,
-    error:
-      error ||
-      loginMutation.error?.message ||
-      signupMutation.error?.message ||
-      logoutMutation.error?.message ||
-      null,
-    login,
-    register,
-    logout,
-    clearError,
-  };
+  const value: AuthContextType = useMemo(
+    () => ({
+      user,
+      isAuthenticated,
+      isLoading: isLoading || loginMutation.isPending || signupMutation.isPending || logoutMutation.isPending,
+      error:
+        error ||
+        loginMutation.error?.message ||
+        signupMutation.error?.message ||
+        logoutMutation.error?.message ||
+        (isError ? queryError?.message || 'Failed to fetch user' : null) ||
+        null,
+      login,
+      register,
+      logout,
+      clearError,
+      setAccessToken,
+      getAccessToken,
+    }),
+    [
+      user,
+      isAuthenticated,
+      isLoading,
+      error,
+      loginMutation.isPending,
+      signupMutation.isPending,
+      logoutMutation.isPending,
+      loginMutation.error,
+      signupMutation.error,
+      logoutMutation.error,
+      isError,
+      queryError,
+      login,
+      register,
+      logout,
+      clearError,
+      setAccessToken,
+      getAccessToken,
+    ]
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
