@@ -7,7 +7,10 @@
 // export { LoginForm } from './components/LoginForm';
 
 // Export pages
-// export { LoginPage } from './pages/LoginPage';
+export { default as Login } from './pages/Login';
+export { default as Register } from './pages/Register';
+export { default as Welcome } from './pages/Welcome';
+export { default as Dashboard } from './pages/Dashboard';
 
 // Export hooks
 // export { useAuth } from './hooks/useAuth';

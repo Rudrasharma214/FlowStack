@@ -11,9 +11,7 @@ export const APP_NAME = 'TMS';
 export const APP_VERSION = '1.0.0';
 
 // Authentication
-export const AUTH_TOKEN_KEY = 'auth_token';
-export const AUTH_REFRESH_TOKEN_KEY = 'refresh_token';
-export const AUTH_USER_KEY = 'auth_user';
+export const AUTH_TOKEN_KEY = 'accessToken';
 
 // Pagination defaults
 export const DEFAULT_PAGE_LIMIT = 10;
