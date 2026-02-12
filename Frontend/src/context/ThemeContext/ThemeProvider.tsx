@@ -16,13 +16,18 @@ const THEME_STORAGE_KEY = 'app-theme';
  */
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [mode, setMode] = useState<ThemeMode>(() => {
-    // Get theme from localStorage or system preference
+    // First priority: check localStorage for saved theme
     const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
-    if (savedTheme) {
+    if (savedTheme === 'light' || savedTheme === 'dark') {
       return savedTheme;
     }
 
-    // Check system preference
+    // Second priority: check if dark class is already on the HTML element
+    if (typeof window !== 'undefined' && document.documentElement.classList.contains('dark')) {
+      return 'dark';
+    }
+
+    // Last resort: check system preference
     if (typeof window !== 'undefined') {
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       return prefersDark ? 'dark' : 'light';
@@ -31,34 +36,32 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     return 'light';
   });
 
-  // Get colors based on current mode
-  const colors = mode === 'light' ? lightTheme : darkTheme;
+  // Get colors based on current mode (memoized to prevent unnecessary recreations)
+  const colors = useMemo(
+    () => (mode === 'light' ? lightTheme : darkTheme),
+    [mode]
+  );
 
   // Apply theme to DOM
   useEffect(() => {
     const root = document.documentElement;
     if (mode === 'dark') {
       root.classList.add('dark');
+      console.log('Applied dark theme to DOM');
     } else {
       root.classList.remove('dark');
+      console.log('Applied light theme to DOM');
     }
     localStorage.setItem(THEME_STORAGE_KEY, mode);
+    console.log('Theme saved to localStorage:', mode);
   }, [mode]);
 
-  // Listen for system theme changes
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      const newMode = e.matches ? 'dark' : 'light';
-      setMode(newMode);
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
-
   const toggleTheme = useCallback(() => {
-    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+    setMode((prevMode) => {
+      const newMode = prevMode === 'light' ? 'dark' : 'light';
+      console.log('Theme toggled from', prevMode, 'to', newMode);
+      return newMode;
+    });
   }, []);
 
   const setTheme = useCallback((newMode: ThemeMode) => {
