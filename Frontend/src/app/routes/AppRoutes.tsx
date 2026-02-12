@@ -5,7 +5,6 @@ import { ErrorBoundary } from '../errorBoundry/errorBoundry';
 import { RootRedirect } from './RootRedirect';
 
 import { authRoutes } from '../../modules/auth/routes';
-import { dashboardRoutes } from '../../modules/dashboard/routes';
 import { subscriptionRoutes } from '../../modules/subscription/routes';
 
 const routes: RouteObject[] = [
@@ -18,7 +17,6 @@ const routes: RouteObject[] = [
         element: <RootRedirect />,
       },
       ...authRoutes,
-      ...dashboardRoutes,
       ...subscriptionRoutes,
       {
         path: '*',
