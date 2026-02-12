@@ -10,6 +10,11 @@ export interface AppError {
  * Use everywhere (API, services, hooks, UI)
  */
 export function handleError(error: unknown, source?: string): AppError {
+  // If it's already an AppError (e.g. from an interceptor)
+  if (error && typeof error === 'object' && 'message' in error && !('response' in error)) {
+    return error as AppError;
+  }
+
   // Axios / HTTP error
   if (isHttpError(error)) {
     const appError: AppError = {

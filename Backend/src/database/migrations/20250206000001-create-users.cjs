@@ -26,6 +26,7 @@ module.exports = {
       profile_pic: {
         type: Sequelize.STRING,
         allowNull: true,
+        defaultValue: 'https://www.pngplay.com/wp-content/uploads/12/User-Avatar-Profile-Transparent-Clip-Art-Background.png',
       },
       role: {
         type: Sequelize.ENUM('admin', 'user'),

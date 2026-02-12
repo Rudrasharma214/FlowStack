@@ -495,7 +495,7 @@ export class AuthService {
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                profilePicture: user.profilePicture
+                profile_pic: user.profile_pic
             };
 
             return {

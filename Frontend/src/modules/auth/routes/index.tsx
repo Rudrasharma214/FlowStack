@@ -4,6 +4,10 @@ import Welcome from '../pages/Welcome';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
+import Profile from '../pages/Profile';
+import ProfileInfo from '../components/profile/ProfileInfo';
+import ChangePassword from '../components/profile/ChangePassword';
+import GeneralSettings from '../components/profile/GeneralSettings';
 import { ProtectedRoute } from '../../../app/routes/ProtectedRoute';
 
 export const authRoutes: RouteObject[] = [
@@ -14,6 +18,28 @@ export const authRoutes: RouteObject[] = [
         <Dashboard />
       </ProtectedRoute>
     ),
+  },
+  {
+    path: '/profile',
+    element: (
+      <ProtectedRoute>
+        <Profile />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <ProfileInfo />,
+      },
+      {
+        path: 'password',
+        element: <ChangePassword />,
+      },
+      {
+        path: 'settings',
+        element: <GeneralSettings />,
+      },
+    ],
   },
   {
     path: '/welcome',

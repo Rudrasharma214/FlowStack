@@ -11,6 +11,7 @@ export { default as Login } from './pages/Login';
 export { default as Register } from './pages/Register';
 export { default as Welcome } from './pages/Welcome';
 export { default as Dashboard } from './pages/Dashboard';
+export { default as Profile } from './pages/Profile';
 
 // Export hooks
 // export { useAuth } from './hooks/useAuth';

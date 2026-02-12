@@ -23,9 +23,10 @@ const User = sequelize.define(
             type: DataTypes.STRING,
             allowNull: true
         },
-        profilePic: {
+        profile_pic: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: true,
+            defaultValue: 'https://www.pngplay.com/wp-content/uploads/12/User-Avatar-Profile-Transparent-Clip-Art-Background.png'
         },
         role: {
             type: DataTypes.ENUM('admin', 'user'),

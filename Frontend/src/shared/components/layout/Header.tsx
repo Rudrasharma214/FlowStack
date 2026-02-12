@@ -67,9 +67,17 @@ export const Header = () => {
             {isAuthenticated ? (
               <div className="relative group">
                 <button className="flex items-center space-x-1 px-2 py-1 rounded-md bg-transparent text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
-                  <div className="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold text-[10px]">
-                    {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
-                  </div>
+                  {user?.profile_pic ? (
+                    <img
+                      src={user.profile_pic}
+                      alt={user.name}
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold text-[10px]">
+                      {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
+                    </div>
+                  )}
 
                   <span className="hidden sm:inline text-xs font-medium leading-none">
                     {user?.name || user?.email?.split('@')[0]}
@@ -88,7 +96,10 @@ export const Header = () => {
                 {/* Dropdown Menu */}
                 <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-gray-800 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150">
                   {/* <p className="block w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-md">{user?.email}</p> */}
-                  <button className="block w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-md">
+                  <button
+                    onClick={() => navigate('/profile')}
+                    className="block w-full text-left px-3 py-1.5 text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-b-md"
+                  >
                     Profile
                   </button>
                   <button
