@@ -2,11 +2,13 @@
  * Module dependencies.
  */
 import express from 'express';
+import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
 /**
  * Custom Middlewares & Utils
  */
+import { corsOptions } from './config/corsOption.js';
 import { errorHandler } from './core/middlewares/error.middleware.js';
 import { sendResponse } from './core/utils/response.js';
 import { STATUS } from './core/constants/statusCodes.js';
@@ -25,31 +27,34 @@ import { projectsRouter } from './modules/projects/index.js';
 
 const app = express();
 
+// Enable CORS
+app.use(cors(corsOptions));
+
 app.use(express.urlencoded({ extended: true }));
 
 // Store raw body for webhook signature verification
 app.use(
-  express.json({
-    verify: (req, _res, buf, encoding) => {
-      if (req.path.includes('/webhook')) {
-        req.rawBody = buf.toString(encoding || 'utf8');
-      }
-    },
-  })
+    express.json({
+        verify: (req, _res, buf, encoding) => {
+            if (req.path.includes('/webhook')) {
+                req.rawBody = buf.toString(encoding || 'utf8');
+            }
+        }
+    })
 );
 
 app.use(cookieParser());
 
 app.get('/', (req, res) => {
-  sendResponse(res, STATUS.OK, 'Server is healthy', {
-    version: 'FlowStack-1.0',
-    ip: req.ip,
-    healthy: true,
-    requestedAt: new Date().toLocaleString('en-IN', {
-      timeZone: 'Asia/Kolkata',
-      hour12: false,
-    }),
-  });
+    sendResponse(res, STATUS.OK, 'Server is healthy', {
+        version: 'FlowStack-1.0',
+        ip: req.ip,
+        healthy: true,
+        requestedAt: new Date().toLocaleString('en-IN', {
+            timeZone: 'Asia/Kolkata',
+            hour12: false
+        })
+    });
 });
 
 app.use('/api/auth', authRouter);

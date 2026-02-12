@@ -37,10 +37,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   });
 
   // Get colors based on current mode (memoized to prevent unnecessary recreations)
-  const colors = useMemo(
-    () => (mode === 'light' ? lightTheme : darkTheme),
-    [mode]
-  );
+  const colors = useMemo(() => (mode === 'light' ? lightTheme : darkTheme), [mode]);
 
   // Apply theme to DOM
   useEffect(() => {
@@ -57,7 +54,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   }, [mode]);
 
   const toggleTheme = useCallback(() => {
-    setMode((prevMode) => {
+    setMode(prevMode => {
       const newMode = prevMode === 'light' ? 'dark' : 'light';
       console.log('Theme toggled from', prevMode, 'to', newMode);
       return newMode;
@@ -78,9 +75,5 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     [mode, colors, toggleTheme, setTheme]
   );
 
-  return (
-    <ThemeContext.Provider value={value}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };

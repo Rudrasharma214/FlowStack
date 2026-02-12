@@ -7,13 +7,13 @@ const Welcome: React.FC = () => {
 
   return (
     <div className="min-h-screen ">
-       {/* Hero Section */}
+      {/* Hero Section */}
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] px-6 py-12">
         <div className="max-w-2xl text-center">
           <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6 transition-colors duration-300">
             Welcome to <span className="text-amber-600 dark:text-amber-400">FlowStack</span>
           </h1>
-          
+
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
             Task Management System - Organize, collaborate, and manage your projects efficiently
           </p>

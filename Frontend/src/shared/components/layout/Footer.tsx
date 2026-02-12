@@ -9,7 +9,8 @@ export const Footer = () => {
           <div>
             <h3 className="text-lg font-bold text-amber-600 dark:text-amber-400 mb-4">FlowStack</h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Multi-management system for efficient workflow and project tracking. Streamline your tasks and collaborate seamlessly with FlowStack.
+              Multi-management system for efficient workflow and project tracking. Streamline your
+              tasks and collaborate seamlessly with FlowStack.
             </p>
           </div>
 

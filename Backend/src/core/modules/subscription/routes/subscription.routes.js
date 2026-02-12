@@ -16,9 +16,9 @@ subscriptionRoutes.use(authenticate);
  * Path : /api/subscriptions
  */
 subscriptionRoutes.post(
-  '/',
-  validate(subscriptionSchema),
-  subscriptionController.createSubscription
+    '/',
+    validate(subscriptionSchema),
+    subscriptionController.createSubscription
 );
 
 /**

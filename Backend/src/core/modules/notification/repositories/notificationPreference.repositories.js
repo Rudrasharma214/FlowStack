@@ -1,4 +1,4 @@
-import NotificationPreference from "../models/notificationPreference.model.js";
+import NotificationPreference from '../models/notificationPreference.model.js';
 
 export class NotificationPreferenceRepository {
     /* Find Notification Preference */
@@ -10,7 +10,12 @@ export class NotificationPreferenceRepository {
     }
 
     /* Update Notification Preferences */
-    async updatePreferences(preferenceId, userId, { enabled, dnd_start, dnd_end }, transaction = null) {
+    async updatePreferences(
+        preferenceId,
+        userId,
+        { enabled, dnd_start, dnd_end },
+        transaction = null
+    ) {
         return await NotificationPreference.update(
             { enabled, dnd_start, dnd_end },
             {
@@ -22,4 +27,4 @@ export class NotificationPreferenceRepository {
             }
         );
     }
-};
+}

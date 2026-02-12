@@ -4,13 +4,13 @@ import { AuthService } from '../services/auth.service.js';
 import { authenticate } from '../middlewares/auth.middleware.js';
 import { validate } from '../../../middlewares/validate.middleware.js';
 import {
-  changePasswordSchema,
-  forgotPasswordSchema,
-  loginSchema,
-  registerSchema,
-  resetPasswordSchema,
-  verifyEmailSchema,
-  verifyLoginOTPschema,
+    changePasswordSchema,
+    forgotPasswordSchema,
+    loginSchema,
+    registerSchema,
+    resetPasswordSchema,
+    verifyEmailSchema,
+    verifyLoginOTPschema
 } from '../validations/user.schema.js';
 
 const authRouter = express.Router();
@@ -31,9 +31,9 @@ authRouter.post('/signup', validate(registerSchema), authController.signup);
  * @access Public
  */
 authRouter.post(
-  '/verify-email',
-  validate(verifyEmailSchema),
-  authController.verifyEmail
+    '/verify-email',
+    validate(verifyEmailSchema),
+    authController.verifyEmail
 );
 
 /**
@@ -49,9 +49,9 @@ authRouter.post('/login', validate(loginSchema), authController.login);
  * @access Public
  */
 authRouter.post(
-  '/verify-login',
-  validate(verifyLoginOTPschema),
-  authController.verifyLoginOTP
+    '/verify-login',
+    validate(verifyLoginOTPschema),
+    authController.verifyLoginOTP
 );
 
 /**
@@ -60,9 +60,9 @@ authRouter.post(
  * @access Public
  */
 authRouter.post(
-  '/forgot-password',
-  validate(forgotPasswordSchema),
-  authController.forgotPassword
+    '/forgot-password',
+    validate(forgotPasswordSchema),
+    authController.forgotPassword
 );
 
 /**
@@ -71,9 +71,9 @@ authRouter.post(
  * @access Public
  */
 authRouter.post(
-  '/reset-password',
-  validate(resetPasswordSchema),
-  authController.resetPassword
+    '/reset-password',
+    validate(resetPasswordSchema),
+    authController.resetPassword
 );
 
 /**
@@ -82,10 +82,10 @@ authRouter.post(
  * @access Private
  */
 authRouter.post(
-  '/change-password',
-  authenticate,
-  validate(changePasswordSchema),
-  authController.changePassword
+    '/change-password',
+    authenticate,
+    validate(changePasswordSchema),
+    authController.changePassword
 );
 
 /**

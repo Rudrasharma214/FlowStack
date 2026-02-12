@@ -1,5 +1,5 @@
-import { sequelize } from "../../../../config/db.js";
-import { DataTypes } from "sequelize";
+import { sequelize } from '../../../../config/db.js';
+import { DataTypes } from 'sequelize';
 
 const NotificationSubscription = sequelize.define(
     'NotificationSubscription',
@@ -65,6 +65,5 @@ const NotificationSubscription = sequelize.define(
         ]
     }
 );
-
 
 export default NotificationSubscription;

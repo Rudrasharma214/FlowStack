@@ -48,7 +48,12 @@ module.exports = {
         comment: 'Priority level of the project task',
       },
       status: {
-        type: Sequelize.ENUM('pending', 'in_progress', 'completed', 'dependent'),
+        type: Sequelize.ENUM(
+          'pending',
+          'in_progress',
+          'completed',
+          'dependent'
+        ),
         allowNull: false,
         defaultValue: 'pending',
         comment: 'Current status of the project task',

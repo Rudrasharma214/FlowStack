@@ -77,8 +77,12 @@ module.exports = {
     });
 
     // Add indexes
-    await queryInterface.addIndex('project_task_dependencies', ['project_task_id']);
-    await queryInterface.addIndex('project_task_dependencies', ['depends_on_task_id']);
+    await queryInterface.addIndex('project_task_dependencies', [
+      'project_task_id',
+    ]);
+    await queryInterface.addIndex('project_task_dependencies', [
+      'depends_on_task_id',
+    ]);
   },
 
   async down(queryInterface, Sequelize) {

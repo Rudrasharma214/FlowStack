@@ -26,19 +26,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const logoutMutation = useLogoutMutation();
 
   // Fetch user ONLY if token exists
-  const { data, isLoading, isError, error: queryError } = useGetUser({
+  const {
+    data,
+    isLoading,
+    isError,
+    error: queryError,
+  } = useGetUser({
     enabled: Boolean(token),
   });
 
   const user = data?.data || data?.user || data || null;
   const isAuthenticated = Boolean(token && user);
 
-  const setAccessToken = useCallback((newToken: string) => {
-    localStorage.setItem('accessToken', newToken);
-    setTokenState(newToken);
-    setError(null);
-    queryClient.invalidateQueries({ queryKey: ['user'] });
-  }, [queryClient]);
+  const setAccessToken = useCallback(
+    (newToken: string) => {
+      localStorage.setItem('accessToken', newToken);
+      setTokenState(newToken);
+      setError(null);
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+    },
+    [queryClient]
+  );
 
   const getAccessToken = useCallback(() => {
     return localStorage.getItem('accessToken');
@@ -51,8 +59,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         logger.info(`Login attempt for email: ${email}`);
         const response = await loginMutation.mutateAsync({ email, password });
 
-        setAccessToken(response.token);
-        logger.info('Login successful');
+        // User sample shows token is in response.data
+        const accessToken = response.data || response.token;
+        if (accessToken) {
+          setAccessToken(accessToken);
+          logger.info('Login successful');
+        } else {
+          throw new Error('No access token received');
+        }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Login failed';
         setError(errorMessage);
@@ -69,7 +83,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       try {
         const response = await signupMutation.mutateAsync({ email, password, name });
 
-        setAccessToken(response.token);
+        const accessToken = response.data || response.token;
+        if (accessToken) {
+          setAccessToken(accessToken);
+        }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Registration failed';
         setError(errorMessage);
@@ -103,7 +120,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     () => ({
       user,
       isAuthenticated,
-      isLoading: isLoading || loginMutation.isPending || signupMutation.isPending || logoutMutation.isPending,
+      isLoading:
+        isLoading ||
+        loginMutation.isPending ||
+        signupMutation.isPending ||
+        logoutMutation.isPending,
       error:
         error ||
         loginMutation.error?.message ||
