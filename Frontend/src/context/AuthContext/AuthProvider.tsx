@@ -5,6 +5,7 @@ import { AuthContext } from './AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLogoutMutation } from '@/modules/auth/hooks/useMutationHooks/useMutate';
 import { useGetUser } from '@/modules/auth/hooks/useQueriesHooks/useQuery';
+import { AUTH_TOKEN_KEY } from '@/shared';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -12,7 +13,7 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const queryClient = useQueryClient();
-  const [token, setTokenState] = useState(() => localStorage.getItem('accessToken'));
+  const [token, setTokenState] = useState(() => localStorage.getItem(AUTH_TOKEN_KEY));
   const [error, setError] = useState<string | null>(null);
 
   // Mutation hooks
@@ -33,7 +34,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const setAccessToken = useCallback(
     (newToken: string) => {
-      localStorage.setItem('accessToken', newToken);
+      localStorage.setItem(AUTH_TOKEN_KEY, newToken);
       setTokenState(newToken);
       setError(null);
       queryClient.invalidateQueries({ queryKey: ['user'] });
@@ -48,11 +49,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       await logoutMutation.mutateAsync();
 
-      localStorage.removeItem('accessToken');
+      localStorage.removeItem(AUTH_TOKEN_KEY);
       setTokenState(null);
       queryClient.clear();
     } catch (err) {
-      localStorage.removeItem('accessToken');
+      localStorage.removeItem(AUTH_TOKEN_KEY);
       setTokenState(null);
       queryClient.clear();
       throw err;
