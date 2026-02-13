@@ -2,13 +2,8 @@ import { useMemo, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { AuthContextType } from './AuthContext';
 import { AuthContext } from './AuthContext';
-import { logger } from '@/services';
 import { useQueryClient } from '@tanstack/react-query';
-import {
-  useLoginMutation,
-  useSignupMutation,
-  useLogoutMutation,
-} from '@/modules/auth/hooks/useMutationHooks/useMutate';
+import { useLogoutMutation } from '@/modules/auth/hooks/useMutationHooks/useMutate';
 import { useGetUser } from '@/modules/auth/hooks/useQueriesHooks/useQuery';
 
 interface AuthProviderProps {
@@ -21,8 +16,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [error, setError] = useState<string | null>(null);
 
   // Mutation hooks
-  const loginMutation = useLoginMutation();
-  const signupMutation = useSignupMutation();
   const logoutMutation = useLogoutMutation();
 
   // Fetch user ONLY if token exists
@@ -48,53 +41,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     [queryClient]
   );
 
-  const getAccessToken = useCallback(() => {
-    return localStorage.getItem('accessToken');
-  }, []);
 
-  const login = useCallback(
-    async (email: string, password: string) => {
-      setError(null);
-      try {
-        logger.info(`Login attempt for email: ${email}`);
-        const response = await loginMutation.mutateAsync({ email, password });
-
-        // User sample shows token is in response.data
-        const accessToken = response.data || response.token;
-        if (accessToken) {
-          setAccessToken(accessToken);
-          logger.info('Login successful');
-        } else {
-          throw new Error('No access token received');
-        }
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Login failed';
-        setError(errorMessage);
-        logger.error('Login error:', err);
-        throw err;
-      }
-    },
-    [loginMutation, setAccessToken]
-  );
-
-  const register = useCallback(
-    async (email: string, password: string, name: string) => {
-      setError(null);
-      try {
-        const response = await signupMutation.mutateAsync({ email, password, name });
-
-        const accessToken = response.data || response.token;
-        if (accessToken) {
-          setAccessToken(accessToken);
-        }
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Registration failed';
-        setError(errorMessage);
-        throw err;
-      }
-    },
-    [signupMutation, setAccessToken]
-  );
 
   const logout = useCallback(async () => {
     setError(null);
@@ -112,9 +59,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }, [logoutMutation, queryClient]);
 
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
+
 
   const value: AuthContextType = useMemo(
     () => ({
@@ -123,34 +68,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       isLoading: isLoading, // Only user data loading, NOT mutation loading
       error:
         error ||
-        loginMutation.error?.message ||
-        signupMutation.error?.message ||
         logoutMutation.error?.message ||
         (isError ? queryError?.message || 'Failed to fetch user' : null) ||
         null,
-      login,
-      register,
       logout,
-      clearError,
       setAccessToken,
-      getAccessToken,
     }),
     [
       user,
       isAuthenticated,
       isLoading,
       error,
-      loginMutation.error,
-      signupMutation.error,
       logoutMutation.error,
       isError,
       queryError,
-      login,
-      register,
       logout,
-      clearError,
       setAccessToken,
-      getAccessToken,
     ]
   );
 
