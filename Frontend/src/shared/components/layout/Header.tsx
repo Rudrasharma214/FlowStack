@@ -1,13 +1,11 @@
 import { useAuth } from '@/context/AuthContext/useAuth';
 import { useTheme } from '@/context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 
 export const Header = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const { mode, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -129,20 +127,7 @@ export const Header = () => {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-          </button>
+
         </div>
       </div>
     </header>

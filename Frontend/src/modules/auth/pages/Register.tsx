@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Input, PasswordInput } from '@/shared/components';
-import { useAuth } from '@/context/AuthContext';
+import { useSignupMutation } from '../hooks/useMutationHooks/useMutate';
 import { logger } from '@/services/logger';
 import type { registerCredentials } from '../types/authService.types';
+import { SignupSuccessModal } from '../components/modals/SignupSuccessModal';
 
 const Register: React.FC = () => {
-  const navigate = useNavigate();
-  const { register, isLoading } = useAuth();
+  const signupMutation = useSignupMutation();
+  const isLoading = signupMutation.isPending;
 
   const [formData, setFormData] = useState<registerCredentials>({
     name: '',
@@ -19,6 +20,7 @@ const Register: React.FC = () => {
   const [errors, setErrors] = useState<Partial<registerCredentials & { confirmPassword: string }>>(
     {}
   );
+  const [signupSuccess, setSignupSuccess] = useState(false);
 
   const validateForm = (): boolean => {
     const newErrors: Partial<registerCredentials & { confirmPassword: string }> = {};
@@ -86,16 +88,15 @@ const Register: React.FC = () => {
     try {
       logger.info('Registration attempt:', formData.email);
 
-      await register(formData.email, formData.password, formData.name);
+      await signupMutation.mutateAsync({
+        email: formData.email,
+        password: formData.password,
+        name: formData.name,
+      });
 
       logger.info('Registration successful');
-
-      // Navigate to verify email page or login page
-      navigate('/login', {
-        state: {
-          message: 'Registration successful! Please check your email to verify your account.',
-        },
-      });
+      // Show success message - server sends verification email
+      setSignupSuccess(true);
     } catch (err: unknown) {
       logger.error('Registration failed:', err);
 
@@ -115,6 +116,14 @@ const Register: React.FC = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen  px-4 py-8">
+      {/* Success Modal Component */}
+      <SignupSuccessModal 
+        isOpen={signupSuccess} 
+        email={formData.email} 
+        onClose={() => setSignupSuccess(false)} 
+      />
+
+      {/* Registration Form Container */}
       <div className="bg-transparent p-10 rounded-xl  w-full max-w-lg">
         {/* Branding */}
         <div className="text-center mb-8">
@@ -212,7 +221,7 @@ const Register: React.FC = () => {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-                Creating account...
+                Signing up...
               </span>
             ) : (
               'Sign up'
@@ -226,7 +235,7 @@ const Register: React.FC = () => {
             <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+            <span className="px-2 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
               Already have an account?
             </span>
           </div>
@@ -240,13 +249,6 @@ const Register: React.FC = () => {
           >
             Sign in
           </Link>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-8">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            © {new Date().getFullYear()} Flowstack
-          </p>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { Header, SecondaryHeader } from './';
 import { Footer } from './Footer';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext/useAuth';
 
 /**
@@ -9,8 +9,9 @@ import { useAuth } from '@/context/AuthContext/useAuth';
  */
 export const MainLayout = () => {
   const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
 
-  if (isLoading) {
+  if (isLoading && isAuthenticated) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-zinc-900">
         <div className="text-center">
@@ -52,7 +53,7 @@ export const MainLayout = () => {
         </main>
       </div>
 
-      <Footer />
+      {location.pathname === '/welcome' && <Footer />}
     </div>
   );
 };

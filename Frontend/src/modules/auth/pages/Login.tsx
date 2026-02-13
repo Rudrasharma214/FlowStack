@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Input, PasswordInput } from '@/shared/components';
 import { useAuth } from '@/context/AuthContext';
+import { useLoginMutation } from '../hooks/useMutationHooks/useMutate';
 import { logger } from '@/services/logger';
 import type { loginCredentials } from '../types/authService.types';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { login, isLoading } = useAuth();
+  const { setAccessToken } = useAuth();
+  const loginMutation = useLoginMutation();
+  const isLoading = loginMutation.isPending;
 
   const [formData, setFormData] = useState<loginCredentials>({
     email: '',
@@ -62,7 +65,16 @@ const Login: React.FC = () => {
     try {
       logger.info('Login attempt:', formData.email);
 
-      await login(formData.email, formData.password);
+      const response = await loginMutation.mutateAsync({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      // Set token in auth context
+      const accessToken = response.data || response.token;
+      if (accessToken) {
+        setAccessToken(accessToken);
+      }
 
       logger.info('Login successful');
 
@@ -169,13 +181,6 @@ const Login: React.FC = () => {
             )}
           </button>
         </form>
-
-        {/* Footer */}
-        <div className="text-center mt-8">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            © {new Date().getFullYear()} Flowstack
-          </p>
-        </div>
       </div>
     </div>
   );

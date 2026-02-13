@@ -3,6 +3,7 @@ import { OpenRoute } from '../../../app/routes/OpenRoute';
 import Welcome from '../pages/Welcome';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
+import VerifyEmail from '../pages/VerifyEmail';
 import Dashboard from '../pages/Dashboard';
 import Profile from '../pages/Profile';
 import ProfileInfo from '../components/profile/ProfileInfo';
@@ -62,6 +63,14 @@ export const authRoutes: RouteObject[] = [
     element: (
       <OpenRoute>
         <Register />
+      </OpenRoute>
+    ),
+  },
+  {
+    path: '/verify-email',
+    element: (
+      <OpenRoute>
+        <VerifyEmail />
       </OpenRoute>
     ),
   },

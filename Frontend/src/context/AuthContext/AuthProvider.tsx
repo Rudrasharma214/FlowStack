@@ -120,11 +120,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     () => ({
       user,
       isAuthenticated,
-      isLoading:
-        isLoading ||
-        loginMutation.isPending ||
-        signupMutation.isPending ||
-        logoutMutation.isPending,
+      isLoading: isLoading, // Only user data loading, NOT mutation loading
       error:
         error ||
         loginMutation.error?.message ||
@@ -144,9 +140,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       isAuthenticated,
       isLoading,
       error,
-      loginMutation.isPending,
-      signupMutation.isPending,
-      logoutMutation.isPending,
       loginMutation.error,
       signupMutation.error,
       logoutMutation.error,
