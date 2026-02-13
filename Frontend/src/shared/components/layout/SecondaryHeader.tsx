@@ -7,14 +7,13 @@ export const SecondaryHeader = () => {
   const navItems = [
     { label: 'Dashboard', path: '/dashboard' },
     { label: 'Projects', path: '/dashboard/projects' },
-    { label: 'Tasks', path: '/dashboard/tasks' },
     { label: 'Subscription', path: '/subscription' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shadow-sm overflow-x-auto no-scrollbar">
+    <div className="sticky top-16 z-40 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 shadow-sm overflow-x-auto no-scrollbar">
       <div className="px-6 h-11 flex items-center justify-center space-x-0 min-w-max md:min-w-0">
         {navItems.map((item) => (
           <button
