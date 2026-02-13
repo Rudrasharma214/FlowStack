@@ -16,7 +16,7 @@ export interface verifyLoginOtpData {
 
 export interface resetPasswordData {
   token: string;
-  newPassword: string;
+  password: string;
 }
 
 export interface changePasswordData {

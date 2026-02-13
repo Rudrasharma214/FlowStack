@@ -3,6 +3,8 @@ import { OpenRoute } from '../../../app/routes/OpenRoute';
 import Welcome from '../pages/Welcome';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
+import ForgotPassword from '../pages/ForgotPassword';
+import ResetPassword from '../pages/ResetPassword';
 import VerifyEmail from '../pages/VerifyEmail';
 import Dashboard from '../pages/Dashboard';
 import Profile from '../pages/Profile';
@@ -63,6 +65,22 @@ export const authRoutes: RouteObject[] = [
     element: (
       <OpenRoute>
         <Register />
+      </OpenRoute>
+    ),
+  },
+  {
+    path: '/forgot-password',
+    element: (
+      <OpenRoute>
+        <ForgotPassword />
+      </OpenRoute>
+    ),
+  },
+  {
+    path: '/reset-password',
+    element: (
+      <OpenRoute>
+        <ResetPassword />
       </OpenRoute>
     ),
   },
