@@ -1,7 +1,29 @@
 import axios from 'axios';
-import type { AxiosInstance, AxiosError } from 'axios';
+import type { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { API_BASE_URL, API_TIMEOUT, AUTH_TOKEN_KEY } from '@/shared/constants';
 import { handleError } from '@/services/errorHandler';
+
+/**
+ * Interface for the items in the failed requests queue
+ */
+interface FailedRequest {
+  resolve: (token: string | null) => void;
+  reject: (error: unknown) => void;
+}
+
+/**
+ * Interface for API error response body
+ */
+interface ApiErrorResponse {
+  message?: string;
+}
+
+/**
+ * Extended Axios request config to include custom properties like _retry
+ */
+interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
 
 /**
  * Create Axios instance with default configuration
@@ -16,9 +38,9 @@ export const api: AxiosInstance = axios.create({
 });
 
 let isRefreshing = false;
-let failedQueue: any[] = [];
+let failedQueue: FailedRequest[] = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue.forEach(prom => {
     if (error) {
       prom.reject(error);
@@ -49,21 +71,24 @@ api.interceptors.request.use(
  */
 api.interceptors.response.use(
   response => response,
-  async (error: AxiosError) => {
-    const originalRequest = error.config as any;
+  async (error: AxiosError<ApiErrorResponse>) => {
+    const originalRequest = error.config as CustomAxiosRequestConfig;
 
     // Handle unauthorized access (401) specifically for expired tokens
     if (
       error.response?.status === 401 &&
-      (error.response.data as any)?.message === 'Invalid or expired token.' &&
+      error.response?.data?.message === 'Invalid or expired token.' &&
+      originalRequest &&
       !originalRequest._retry
     ) {
       if (isRefreshing) {
-        return new Promise((resolve, reject) => {
+        return new Promise<string | null>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
           .then(token => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
+            if (token && originalRequest.headers) {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+            }
             return api(originalRequest);
           })
           .catch(err => Promise.reject(err));
@@ -73,7 +98,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const response = await axios.post(
+        const response = await axios.post<{ data: string }>(
           `${API_BASE_URL}/auth/refresh-token`,
           {},
           { withCredentials: true }
@@ -85,7 +110,10 @@ api.interceptors.response.use(
         if (accessToken) {
           localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
           api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+          
+          if (originalRequest.headers) {
+            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+          }
 
           processQueue(null, accessToken);
           return api(originalRequest);
@@ -94,7 +122,7 @@ api.interceptors.response.use(
         processQueue(refreshError, null);
         localStorage.removeItem(AUTH_TOKEN_KEY);
         // Optional: window.location.href = '/login';
-        return Promise.reject(handleError(refreshError as AxiosError, 'Token Refresh'));
+        return Promise.reject(handleError(refreshError, 'Token Refresh'));
       } finally {
         isRefreshing = false;
       }
