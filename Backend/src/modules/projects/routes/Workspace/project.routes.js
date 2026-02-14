@@ -2,8 +2,8 @@ import express from 'express';
 import { authenticate } from '../../../../core/modules/auth/middlewares/auth.middleware.js';
 import { validate } from '../../../../core/middlewares/validate.middleware.js';
 import {
-    createProjectSchema,
-    updateProjectSchema
+  createProjectSchema,
+  updateProjectSchema,
 } from '../../validations/Workspace/project.schema.js';
 import { ProjectService } from '../../services/Workspace/project.service.js';
 import { ProjectController } from '../../controllers/Workspace/project.controller.js';
@@ -25,9 +25,9 @@ projectRoutes.use(authenticate);
  * @access  Protected (requires authentication)
  */
 projectRoutes.post(
-    '/',
-    validate(createProjectSchema),
-    projectController.createProject
+  '/',
+  validate(createProjectSchema),
+  projectController.createProject
 );
 
 /**
@@ -50,9 +50,9 @@ projectRoutes.get('/:projectId', projectController.getProjectById);
  * @access  Protected (requires authentication)
  */
 projectRoutes.put(
-    '/:projectId',
-    validate(updateProjectSchema),
-    projectController.updateProject
+  '/:projectId',
+  validate(updateProjectSchema),
+  projectController.updateProject
 );
 
 /**

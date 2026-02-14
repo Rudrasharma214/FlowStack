@@ -3,77 +3,77 @@ import env from './env.js';
 import logger from './logger.js';
 
 export const sequelize = new Sequelize(
-    env.DB_NAME,
-    env.DB_USER,
-    env.DB_PASSWORD,
-    {
-        host: env.DB_HOST,
-        dialect: 'mysql',
-        port: Number(env.DB_PORT) || 3306,
+  env.DB_NAME,
+  env.DB_USER,
+  env.DB_PASSWORD,
+  {
+    host: env.DB_HOST,
+    dialect: 'mysql',
+    port: Number(env.DB_PORT) || 3306,
 
-        logging: false,
+    logging: false,
 
-        pool: {
-            max: 10,
-            min: 0,
-            acquire: 30000,
-            idle: 10000
-        },
+    pool: {
+      max: 10,
+      min: 0,
+      acquire: 30000,
+      idle: 10000,
+    },
 
-        define: {
-            underscored: true,
-            timestamps: true
-        },
+    define: {
+      underscored: true,
+      timestamps: true,
+    },
 
-        dialectOptions: {
-            charset: 'utf8mb4',
-            timezone: '+05:30'
-        }
-    }
+    dialectOptions: {
+      charset: 'utf8mb4',
+      timezone: '+05:30',
+    },
+  }
 );
 
 export const connectDB = async () => {
-    try {
-        logger.info('Connecting to database...');
-        await sequelize.authenticate();
-        logger.info('Database connected');
+  try {
+    logger.info('Connecting to database...');
+    await sequelize.authenticate();
+    logger.info('Database connected');
 
-        return true;
-    } catch (err) {
-        logger.error('Database connection failed');
-        logger.error(err);
-        process.exit(1);
-    }
+    return true;
+  } catch (err) {
+    logger.error('Database connection failed');
+    logger.error(err);
+    process.exit(1);
+  }
 };
 
 export const syncDB = async () => {
-    try {
-        logger.info('Syncing database...');
-        await sequelize.sync({ alter: false });
-        logger.info('Database synced');
-    } catch (err) {
-        logger.error('Sync failed');
-        throw err;
-    }
+  try {
+    logger.info('Syncing database...');
+    await sequelize.sync({ alter: false });
+    logger.info('Database synced');
+  } catch (err) {
+    logger.error('Sync failed');
+    throw err;
+  }
 };
 
 export const loadAssociations = async () => {
-    logger.info('Loading model associations...');
-    // import all association here to avoid circular dependencies
-    const { ProjectAssociations } = await import('../modules/projects/index.js');
+  logger.info('Loading model associations...');
+  // import all association here to avoid circular dependencies
+  const { ProjectAssociations } = await import('../modules/projects/index.js');
 
-    await import('../core/modules/index.js');
-    ProjectAssociations();
+  await import('../core/modules/index.js');
+  ProjectAssociations();
 
-    logger.info('Model associations loaded');
+  logger.info('Model associations loaded');
 };
 
 export const disconnectDB = async () => {
-    try {
-        await sequelize.close();
-        logger.info('Database disconnected');
-    } catch (err) {
-        logger.error('Error while closing DB');
-        logger.error(err);
-    }
+  try {
+    await sequelize.close();
+    logger.info('Database disconnected');
+  } catch (err) {
+    logger.error('Error while closing DB');
+    logger.error(err);
+  }
 };

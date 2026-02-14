@@ -1,7 +1,7 @@
 import { emailLayout } from '../../../config/emailTemplate.js';
 
 export const sendForgotPasswordEmailTemplate = (name, resetLink) => {
-    const body = `
+  const body = `
 
 <!-- ================= TITLE ================= -->
 <tr>
@@ -147,14 +147,14 @@ If you did not request a password reset, please ignore this email.
 
 `;
 
-    return emailLayout({
-        title: 'Reset Your Password',
-        body
-    });
+  return emailLayout({
+    title: 'Reset Your Password',
+    body,
+  });
 };
 
 export const sendPasswordResetSuccessEmailTemplate = (name) => {
-    const body = `
+  const body = `
 
 <!-- ================= TITLE ================= -->
 <tr>
@@ -268,8 +268,8 @@ This is a security notification sent to protect your account.
 
 `;
 
-    return emailLayout({
-        title: 'Password Updated',
-        body
-    });
+  return emailLayout({
+    title: 'Password Updated',
+    body,
+  });
 };

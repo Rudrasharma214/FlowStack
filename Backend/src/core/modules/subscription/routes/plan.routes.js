@@ -4,8 +4,8 @@ import { PlanService } from '../services/plan.service.js';
 import { adminAuthenticate } from '../../auth/middlewares/auth.middleware.js';
 import { validate } from '../../../middlewares/validate.middleware.js';
 import {
-    createPlanSchema,
-    updatePlanSchema
+  createPlanSchema,
+  updatePlanSchema,
 } from '../validations/plan.validation.js';
 
 const planService = new PlanService();

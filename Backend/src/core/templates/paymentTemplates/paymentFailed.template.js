@@ -1,11 +1,11 @@
 import { emailLayout } from '../../../config/emailTemplate.js';
 
 export const sendPaymentFailedEmailTemplate = ({
-    transactionId,
-    planName,
-    name
+  transactionId,
+  planName,
+  name,
 }) => {
-    const body = `
+  const body = `
 
 <!-- ================= TITLE ================= -->
 <tr>
@@ -113,8 +113,8 @@ If you believe this is an error or need help completing the payment, reply to th
 
 `;
 
-    return emailLayout({
-        title: 'Payment Failed',
-        body
-    });
+  return emailLayout({
+    title: 'Payment Failed',
+    body,
+  });
 };
