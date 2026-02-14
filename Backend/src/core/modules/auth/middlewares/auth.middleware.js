@@ -6,62 +6,62 @@ import { verifyToken } from '../utils/token.util.js';
  * Middleware to authenticate users based on JWT token.
  */
 export const authenticate = (req, res, next) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
 
-    if (!token) {
-      return sendErrorResponse(
-        res,
-        STATUS.UNAUTHORIZED,
-        'Invalid or expired token.'
-      );
+        if (!token) {
+            return sendErrorResponse(
+                res,
+                STATUS.UNAUTHORIZED,
+                'Invalid or expired token.'
+            );
+        }
+
+        const decoded = verifyToken(token);
+
+        req.user = decoded;
+        next();
+    } catch (error) {
+        return sendErrorResponse(
+            res,
+            STATUS.UNAUTHORIZED,
+            'Invalid or expired token.',
+            error.message
+        );
     }
-
-    const decoded = verifyToken(token);
-
-    req.user = decoded;
-    next();
-  } catch (error) {
-    return sendErrorResponse(
-      res,
-      STATUS.UNAUTHORIZED,
-      'Invalid or expired token.',
-      error.message
-    );
-  }
 };
 
 /**
  * Middleware to authenticate admin user based on JWT token.
  */
 export const adminAuthenticate = (req, res, next) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return sendErrorResponse(
-        res,
-        STATUS.UNAUTHORIZED,
-        'Invalid or expired token.'
-      );
-    }
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return sendErrorResponse(
+                res,
+                STATUS.UNAUTHORIZED,
+                'Invalid or expired token.'
+            );
+        }
 
-    const decoded = verifyToken(token);
+        const decoded = verifyToken(token);
 
-    if (decoded.role !== 'admin') {
-      return sendErrorResponse(
-        res,
-        STATUS.FORBIDDEN,
-        'Access denied. Admins only.'
-      );
+        if (decoded.role !== 'admin') {
+            return sendErrorResponse(
+                res,
+                STATUS.FORBIDDEN,
+                'Access denied. Admins only.'
+            );
+        }
+        req.user = decoded;
+        next();
+    } catch (error) {
+        return sendErrorResponse(
+            res,
+            STATUS.UNAUTHORIZED,
+            'Invalid or expired token.',
+            error.message
+        );
     }
-    req.user = decoded;
-    next();
-  } catch (error) {
-    return sendErrorResponse(
-      res,
-      STATUS.UNAUTHORIZED,
-      'Invalid or expired token.',
-      error.message
-    );
-  }
 };

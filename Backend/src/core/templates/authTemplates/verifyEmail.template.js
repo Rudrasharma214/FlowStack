@@ -1,7 +1,7 @@
 import { emailLayout } from '../../../config/emailTemplate.js';
 
 export const sendVerifyEmailTemplate = (name, verifyLink) => {
-  const body = `
+    const body = `
 
 <!-- ================= TITLE (CENTER) ================= -->
 <tr>
@@ -147,8 +147,8 @@ export const sendVerifyEmailTemplate = (name, verifyLink) => {
 
 `;
 
-  return emailLayout({
-    title: 'Verify Your Email',
-    body,
-  });
+    return emailLayout({
+        title: 'Verify Your Email',
+        body
+    });
 };

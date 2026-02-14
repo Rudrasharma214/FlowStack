@@ -1,13 +1,13 @@
 import { emailLayout } from '../../../config/emailTemplate.js';
 
 export const sendProjectInviteTokenTemplate = ({
-  invitedUserName,
-  email,
-  projectName,
-  inviterName,
-  inviteLink,
+    invitedUserName,
+    email,
+    projectName,
+    inviterName,
+    inviteLink
 }) => {
-  const body = `
+    const body = `
 
 <!-- ================= TITLE ================= -->
 <tr>
@@ -120,8 +120,8 @@ If you weren’t expecting this invitation, you can safely ignore this email.
 </tr>
 `;
 
-  return emailLayout({
-    title: `Invitation to join ${projectName}`,
-    body,
-  });
+    return emailLayout({
+        title: `Invitation to join ${projectName}`,
+        body
+    });
 };

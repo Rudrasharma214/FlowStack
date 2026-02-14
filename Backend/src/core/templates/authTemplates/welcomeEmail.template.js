@@ -1,7 +1,7 @@
 import { emailLayout } from '../../../config/emailTemplate.js';
 
 export const sendWelcomeEmailTemplate = (name) => {
-  const body = `
+    const body = `
 
 <!-- ================= TITLE ================= -->
 <tr>
@@ -91,8 +91,8 @@ If you have any questions, feel free to reply to this email — we’re happy to
 
 `;
 
-  return emailLayout({
-    title: 'Welcome',
-    body,
-  });
+    return emailLayout({
+        title: 'Welcome',
+        body
+    });
 };

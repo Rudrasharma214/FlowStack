@@ -1,13 +1,13 @@
 import Plan from '../models/plan.model.js';
 import { STATUS } from '../../../constants/statusCodes.js';
 import {
-  createRazorpayOrder,
-  verifyRazorpaySignature,
+    createRazorpayOrder,
+    verifyRazorpaySignature
 } from '../utils/payment.utils.js';
 import { sequelize } from '../../../../config/db.js';
 import {
-  handlePaymentCaptured,
-  handlePaymentFailed,
+    handlePaymentCaptured,
+    handlePaymentFailed
 } from './webhook.service.js';
 import { generateInvoiceNumber } from '../utils/invoiceNumber.utils.js';
 import { PaymentRepository } from '../repositories/payment.repositories.js';
@@ -16,122 +16,122 @@ import { SubscriptionRepository } from '../repositories/subscription.repositorie
 const paymentRepository = new PaymentRepository();
 const subscriptionRepository = new SubscriptionRepository();
 export class PaymentService {
-  /* Create Payment Order */
-  async createPaymentOrder(userId, subscriptionId) {
-    const transaction = await sequelize.transaction();
-    try {
-      const subscription = await subscriptionRepository.findOne({
-        where: { id: subscriptionId },
-        include: [
-          {
-            model: Plan,
-            as: 'plan',
-          },
-        ],
-        transaction,
-      });
-      if (!subscription) {
-        await transaction.rollback();
-        return {
-          success: false,
-          message: 'Subscription not found',
-          statusCode: STATUS.NOT_FOUND,
-        };
-      }
+    /* Create Payment Order */
+    async createPaymentOrder(userId, subscriptionId) {
+        const transaction = await sequelize.transaction();
+        try {
+            const subscription = await subscriptionRepository.findOne({
+                where: { id: subscriptionId },
+                include: [
+                    {
+                        model: Plan,
+                        as: 'plan'
+                    }
+                ],
+                transaction
+            });
+            if (!subscription) {
+                await transaction.rollback();
+                return {
+                    success: false,
+                    message: 'Subscription not found',
+                    statusCode: STATUS.NOT_FOUND
+                };
+            }
 
-      const price =
+            const price =
         subscription.billing_cycle === 'monthly'
-          ? subscription.plan.monthly_price
-          : subscription.plan.yearly_price;
+            ? subscription.plan.monthly_price
+            : subscription.plan.yearly_price;
 
-      const invoiceNumber = await generateInvoiceNumber({ transaction });
+            const invoiceNumber = await generateInvoiceNumber({ transaction });
 
-      const order = await createRazorpayOrder(
-        price,
-        'INR',
-        `receipt_${userId}_${subscriptionId}_${Date.now()}`
-      );
-      const paymentData = {
-        subscription_id: subscriptionId,
-        plan_id: subscription.plan.id,
-        user_id: userId,
-        amount: order.amount / 100,
-        payment_date: new Date(),
-        payment_method: 'Razorpay',
-        gateway_order_id: order.id,
-        currency: order.currency,
-        status: 'pending',
-        invoice_number: invoiceNumber,
-      };
-      const payment = await paymentRepository.createPayment(
-        paymentData,
-        transaction
-      );
+            const order = await createRazorpayOrder(
+                price,
+                'INR',
+                `receipt_${userId}_${subscriptionId}_${Date.now()}`
+            );
+            const paymentData = {
+                subscription_id: subscriptionId,
+                plan_id: subscription.plan.id,
+                user_id: userId,
+                amount: order.amount / 100,
+                payment_date: new Date(),
+                payment_method: 'Razorpay',
+                gateway_order_id: order.id,
+                currency: order.currency,
+                status: 'pending',
+                invoice_number: invoiceNumber
+            };
+            const payment = await paymentRepository.createPayment(
+                paymentData,
+                transaction
+            );
 
-      await transaction.commit();
+            await transaction.commit();
 
-      return {
-        success: true,
-        message: 'Payment order created successfully',
-        data: payment,
-      };
-    } catch (error) {
-      await transaction.rollback();
-      return {
-        success: false,
-        message: 'Error creating payment order',
-        error: error.message,
-        statusCode: STATUS.INTERNAL_ERROR,
-      };
+            return {
+                success: true,
+                message: 'Payment order created successfully',
+                data: payment
+            };
+        } catch (error) {
+            await transaction.rollback();
+            return {
+                success: false,
+                message: 'Error creating payment order',
+                error: error.message,
+                statusCode: STATUS.INTERNAL_ERROR
+            };
+        }
     }
-  }
 
-  /* Handle Razorpay Webhook */
-  async handlePaymentWebhook(webhookBody, signature) {
-    const transaction = await sequelize.transaction();
+    /* Handle Razorpay Webhook */
+    async handlePaymentWebhook(webhookBody, signature) {
+        const transaction = await sequelize.transaction();
 
-    try {
-      const isValidSignature = verifyRazorpaySignature(webhookBody, signature);
-      if (!isValidSignature) {
-        return {
-          success: false,
-          message: 'Invalid webhook signature',
-          statusCode: STATUS.UNAUTHORIZED,
-        };
-      }
+        try {
+            const isValidSignature = verifyRazorpaySignature(webhookBody, signature);
+            if (!isValidSignature) {
+                return {
+                    success: false,
+                    message: 'Invalid webhook signature',
+                    statusCode: STATUS.UNAUTHORIZED
+                };
+            }
 
-      const event = JSON.parse(webhookBody);
-      const eventType = event.event;
+            const event = JSON.parse(webhookBody);
+            const eventType = event.event;
 
-      switch (eventType) {
-        case 'payment.failed':
-          return await handlePaymentFailed(
-            event.payload.payment.entity,
-            transaction
-          );
+            switch (eventType) {
+            case 'payment.failed':
+                return await handlePaymentFailed(
+                    event.payload.payment.entity,
+                    transaction
+                );
 
-        case 'payment.captured':
-          return await handlePaymentCaptured(
-            event.payload.payment.entity,
-            transaction
-          );
+            case 'payment.captured':
+                return await handlePaymentCaptured(
+                    event.payload.payment.entity,
+                    transaction
+                );
 
-        default:
-          await transaction.commit();
-          return {
-            success: true,
-            message: `Webhook event ${eventType} received`,
-            statusCode: STATUS.OK,
-          };
-      }
-    } catch (error) {
-      await transaction.rollback();
-      return {
-        success: false,
-        message: 'Error processing webhook',
-        error: error.message,
-        statusCode: STATUS.INTERNAL_ERROR,
-      };
+            default:
+                await transaction.commit();
+                return {
+                    success: true,
+                    message: `Webhook event ${eventType} received`,
+                    statusCode: STATUS.OK
+                };
+            }
+        } catch (error) {
+            await transaction.rollback();
+            return {
+                success: false,
+                message: 'Error processing webhook',
+                error: error.message,
+                statusCode: STATUS.INTERNAL_ERROR
+            };
+        }
     }
-  }
 }

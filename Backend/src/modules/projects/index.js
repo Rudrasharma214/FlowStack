@@ -20,6 +20,6 @@ import { WorkspaceAssociations } from './models/Workspace/associations.js';
 import { ProjectTaskAssociations } from './models/Tasks/associations.js';
 
 export const ProjectAssociations = () => {
-  WorkspaceAssociations.associate();
-  ProjectTaskAssociations.associate();
+    WorkspaceAssociations.associate();
+    ProjectTaskAssociations.associate();
 };

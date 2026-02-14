@@ -58,8 +58,8 @@ projectTaskRoutes.post('/:taskId/add', projectTaskController.addDependencies);
  * @access Private
  */
 projectTaskRoutes.post(
-  '/:taskId/remove/:dependencyId',
-  projectTaskController.removeDependencies
+    '/:taskId/remove/:dependencyId',
+    projectTaskController.removeDependencies
 );
 
 export default projectTaskRoutes;

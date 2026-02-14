@@ -7,17 +7,30 @@ const notificationRouter = express.Router();
 notificationRouter.use(authenticate);
 
 /**
+ * @route GET /api/notifications/subscribe
+ * @desc Subscribe to real-time notifications via WebSocket
+ */
+notificationRouter.post(
+    '/subscribe',
+    NotificationController.subscribeToNotifications
+);
+
+/**
  * @route GET /api/notifications
  * @desc Get notification preferences for the authenticated user
- */ notificationRouter.get('/', NotificationController.getPreferences);
+ */ 
+notificationRouter.get(
+    '/', 
+    NotificationController.getPreferences
+);
 
 /**
  * @route PUT /api/notifications/:preferenceId
  * @desc Update notification preferences for the authenticated user
  */
 notificationRouter.put(
-  '/:preferenceId',
-  NotificationController.updatePreferences
+    '/:preferenceId',
+    NotificationController.updatePreferences
 );
 
 export default notificationRouter;

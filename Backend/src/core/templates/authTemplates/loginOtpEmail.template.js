@@ -1,7 +1,7 @@
 import { emailLayout } from '../../../config/emailTemplate.js';
 
 export const sendLoginOtpEmailTemplate = (name, otp, expiresIn) => {
-  const body = `
+    const body = `
 
 <!-- ================= TITLE (CENTER) ================= -->
 <tr>
@@ -116,8 +116,8 @@ If you did not attempt to log in, please ignore this email.
 
 `;
 
-  return emailLayout({
-    title: 'Login Verification Code',
-    body,
-  });
+    return emailLayout({
+        title: 'Login Verification Code',
+        body
+    });
 };
