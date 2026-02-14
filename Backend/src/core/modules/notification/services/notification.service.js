@@ -1,3 +1,4 @@
+import { STATUS } from '../../../constants/statusCodes.js';
 import { NotificationPreferenceRepository } from '../repositories/notificationPreference.repositories.js';
 
 const prefrerenceRepo = new NotificationPreferenceRepository();
@@ -16,7 +17,7 @@ export class NotificationService {
             if (!preference) {
                 return {
                     success: false,
-                    statusCode: 404,
+                    statusCode: STATUS.NOT_FOUND,
                     message: 'Notification preference not found for the user.',
                     errors: []
                 };
@@ -30,7 +31,7 @@ export class NotificationService {
 
             return {
                 success: true,
-                statusCode: 200,
+                statusCode: STATUS.OK,
                 message: 'Notification preferences updated successfully.',
                 data: {
                     id: preferenceId,
@@ -43,10 +44,40 @@ export class NotificationService {
         } catch (error) {
             return {
                 success: false,
-                statusCode: 500,
+                statusCode: STATUS.INTERNAL_ERROR,
                 message: 'An error occurred while updating notification preferences.',
                 errors: [error.message]
             };
         }
     }
+
+    /* Get Notification Preferences */
+    async getPreferences(userId) {
+        try {
+            const where = { user_id: userId };
+            const preferences = await prefrerenceRepo.findOne(where);
+            if(!preferences) {
+                return {
+                    success: false,
+                    statusCode: STATUS.NOT_FOUND,
+                    message: 'No notification preferences found for the user.',
+                    errors: []
+                };
+            }
+
+            return {
+                success: true,
+                statusCode: STATUS.OK,
+                message: 'Notification preferences retrieved successfully.',
+                data: preferences
+            };
+        } catch (error) {
+            return {
+                success: false,
+                statusCode: STATUS.INTERNAL_ERROR,
+                message: 'An error occurred while retrieving notification preferences.',
+                errors: [error.message]
+            };
+        }
+    };
 }

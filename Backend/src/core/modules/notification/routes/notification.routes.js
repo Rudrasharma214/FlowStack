@@ -4,6 +4,13 @@ import { authenticate } from '../../../middleware/auth.middleware.js';
 
 const notificationRouter = express.Router();
 
+notificationRouter.use(authenticate);
+
+/**
+ * @route GET /api/notifications
+ * @desc Get notification preferences for the authenticated user
+ */notificationRouter.get('/', NotificationController.getPreferences);
+
 /**
  * @route PUT /api/notifications/:preferenceId
  * @desc Update notification preferences for the authenticated user
