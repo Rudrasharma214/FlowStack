@@ -43,11 +43,7 @@ export const Plans: React.FC = () => {
 
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {plans?.map((plan: Plan) => (
-            <PlanCard 
-              key={plan.id} 
-              plan={plan} 
-              onSelect={handleSelectPlan} 
-            />
+            <PlanCard key={plan.id} plan={plan} onSelect={handleSelectPlan} />
           ))}
         </div>
       </div>

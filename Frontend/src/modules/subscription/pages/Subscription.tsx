@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { logger } from '@/services/logger';
 import { useSubscriptionMutation } from '../hooks/useMutationsHooks/useSubscriptionMutation';
@@ -12,19 +12,18 @@ const Subscription: React.FC = () => {
   const subscriptionMutation = useSubscriptionMutation();
   const paymentMutation = usePaymentMutation();
   const { data: plansData, isLoading: isLoadingPlans } = useActiveGetPlan();
-  
+
   const [selectedPlanId, setSelectedPlanId] = useState<string>(urlPlanId || '');
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   const [autoRenew, setAutoRenew] = useState<boolean>(true);
 
-  useEffect(() => {
-    if (urlPlanId) {
-      setSelectedPlanId(urlPlanId);
-    }
-  }, [urlPlanId]);
+  // Sync state if urlPlanId changes (without triggering cascading render in useEffect if possible)
+  if (urlPlanId && urlPlanId !== selectedPlanId && !isLoadingPlans) {
+    setSelectedPlanId(urlPlanId);
+  }
 
   const loadRazorpayScript = () => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const script = document.createElement('script');
       script.src = 'https://checkout.razorpay.com/v1/checkout.js';
       script.onload = () => resolve(true);
@@ -61,11 +60,11 @@ const Subscription: React.FC = () => {
     };
 
     subscriptionMutation.mutate(subscriptionData, {
-      onSuccess: (data) => {
+      onSuccess: data => {
         const subscriptionId = data.data.id;
-        
+
         paymentMutation.mutate(subscriptionId, {
-          onSuccess: (paymentData) => {
+          onSuccess: paymentData => {
             const { gateway_order_id, amount, currency } = paymentData.data;
 
             const options = {
@@ -75,7 +74,11 @@ const Subscription: React.FC = () => {
               name: 'FlowStack',
               description: 'Plan Subscription',
               order_id: gateway_order_id,
-              handler: function (response: any) {
+              handler: function (response: {
+                razorpay_payment_id: string;
+                razorpay_order_id: string;
+                razorpay_signature: string;
+              }) {
                 logger.info('Payment successful', response);
                 navigate('/dashboard');
               },
@@ -89,16 +92,18 @@ const Subscription: React.FC = () => {
               },
             };
 
-            const paymentObject = new (window as any).Razorpay(options);
+            const paymentObject = new (
+              window as unknown as { Razorpay: new (options: unknown) => { open: () => void } }
+            ).Razorpay(options);
             paymentObject.open();
           },
-          onError: (error: any) => {
+          onError: (error: Error) => {
             logger.error('Payment initialization failed', error);
           },
         });
       },
-      onError: (error: any) => {
-        logger.error('Subscription creation failed', error);  
+      onError: (error: Error) => {
+        logger.error('Subscription creation failed', error);
       },
     });
   };
@@ -116,8 +121,10 @@ const Subscription: React.FC = () => {
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8 bg-transparent">
       <div className="max-w-md mx-auto bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700">
-        <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white text-center">Customize Your Subscription</h1>
-        
+        <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white text-center">
+          Customize Your Subscription
+        </h1>
+
         <div className="space-y-6">
           {/* Plan Selection */}
           <div>
@@ -126,13 +133,16 @@ const Subscription: React.FC = () => {
             </label>
             <select
               value={selectedPlanId}
-              onChange={(e) => setSelectedPlanId(e.target.value)}
+              onChange={e => setSelectedPlanId(e.target.value)}
               className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-amber-500 outline-none transition-all"
             >
-              <option value="" disabled>Choose a plan</option>
+              <option value="" disabled>
+                Choose a plan
+              </option>
               {plansData?.data?.map((plan: Plan) => (
                 <option key={plan.id} value={plan.id}>
-                  {plan.name} - ₹{billingCycle === 'monthly' ? plan.monthly_price : plan.yearly_price}
+                  {plan.name} - ₹
+                  {billingCycle === 'monthly' ? plan.monthly_price : plan.yearly_price}
                 </option>
               ))}
             </select>
@@ -171,7 +181,9 @@ const Subscription: React.FC = () => {
 
           {/* Auto Renew Toggle */}
           <div className="flex items-center justify-between py-2">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Auto-renew subscription</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Auto-renew subscription
+            </span>
             <button
               type="button"
               onClick={() => setAutoRenew(!autoRenew)}
@@ -192,23 +204,32 @@ const Subscription: React.FC = () => {
             <div className="mt-8 p-4 rounded-xl bg-gray-50 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm text-gray-500 dark:text-gray-400">Selected Plan</span>
-                <span className="font-semibold text-gray-900 dark:text-white">{selectedPlan.name}</span>
+                <span className="font-semibold text-gray-900 dark:text-white">
+                  {selectedPlan.name}
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500 dark:text-gray-400">Total Price</span>
                 <span className="text-xl font-bold text-amber-600">
-                  ₹{billingCycle === 'monthly' ? selectedPlan.monthly_price : selectedPlan.yearly_price}
+                  ₹
+                  {billingCycle === 'monthly'
+                    ? selectedPlan.monthly_price
+                    : selectedPlan.yearly_price}
                 </span>
               </div>
             </div>
           )}
-          
+
           <button
             onClick={handleSubscribe}
-            disabled={subscriptionMutation.isPending || paymentMutation.isPending || !selectedPlanId}
+            disabled={
+              subscriptionMutation.isPending || paymentMutation.isPending || !selectedPlanId
+            }
             className="w-full mt-8 py-4 px-8 rounded-lg font-bold text-center transition-colors bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {subscriptionMutation.isPending || paymentMutation.isPending ? 'Processing...' : 'Proceed to Payment'}
+            {subscriptionMutation.isPending || paymentMutation.isPending
+              ? 'Processing...'
+              : 'Proceed to Payment'}
           </button>
         </div>
 
