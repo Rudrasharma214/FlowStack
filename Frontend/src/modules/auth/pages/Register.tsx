@@ -107,9 +107,7 @@ const Register: React.FC = () => {
 
       // Handle specific error messages from the API
       const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        'Registration failed. Please try again.';
+        error.response?.data?.message || error.message || 'Registration failed. Please try again.';
       setErrors({ email: errorMessage });
     }
   };
@@ -117,10 +115,10 @@ const Register: React.FC = () => {
   return (
     <div className="flex items-center justify-center min-h-screen  px-4 py-8">
       {/* Success Modal Component */}
-      <SignupSuccessModal 
-        isOpen={signupSuccess} 
-        email={formData.email} 
-        onClose={() => setSignupSuccess(false)} 
+      <SignupSuccessModal
+        isOpen={signupSuccess}
+        email={formData.email}
+        onClose={() => setSignupSuccess(false)}
       />
 
       {/* Registration Form Container */}

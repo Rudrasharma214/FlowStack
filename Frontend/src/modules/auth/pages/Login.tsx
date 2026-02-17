@@ -150,7 +150,9 @@ const Login: React.FC = () => {
 
       // Handle specific error messages from the API
       const errorMessage =
-        error.response?.data?.message || error.message || 'OTP verification failed. Please try again.';
+        error.response?.data?.message ||
+        error.message ||
+        'OTP verification failed. Please try again.';
       setErrors({ password: errorMessage });
     }
   };
@@ -220,7 +222,7 @@ const Login: React.FC = () => {
               label="OTP Code"
               placeholder="Enter 6-digit OTP"
               value={otpCode}
-              onChange={(e) => {
+              onChange={e => {
                 setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6));
                 if (errors.password) {
                   setErrors(prev => ({
@@ -267,8 +269,10 @@ const Login: React.FC = () => {
                 </svg>
                 {isOtpStep ? 'Verifying...' : 'Signing in...'}
               </span>
+            ) : isOtpStep ? (
+              'Verify OTP'
             ) : (
-              isOtpStep ? 'Verify OTP' : 'Sign in'
+              'Sign in'
             )}
           </button>
 

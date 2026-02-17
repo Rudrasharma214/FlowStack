@@ -35,8 +35,10 @@ const ForgotPassword: React.FC = () => {
     try {
       logger.info('Forgot password attempt for:', email);
       const response = await forgotPasswordMutation.mutateAsync(email);
-      
-      setModalMessage(response.message || 'If an account exists with that email, a reset link has been sent.');
+
+      setModalMessage(
+        response.message || 'If an account exists with that email, a reset link has been sent.'
+      );
       setShowModal(true);
     } catch (err: unknown) {
       logger.error('Forgot password failed:', err);
@@ -44,7 +46,10 @@ const ForgotPassword: React.FC = () => {
         response?: { data?: { message?: string } };
         message?: string;
       };
-      const errorMessage = errorResponse.response?.data?.message || errorResponse.message || 'Something went wrong. Please try again.';
+      const errorMessage =
+        errorResponse.response?.data?.message ||
+        errorResponse.message ||
+        'Something went wrong. Please try again.';
       setError(errorMessage);
     }
   };
@@ -70,7 +75,7 @@ const ForgotPassword: React.FC = () => {
             label="Email Address"
             placeholder="you@company.com"
             value={email}
-            onChange={(e) => {
+            onChange={e => {
               setEmail(e.target.value);
               if (error) setError(null);
             }}
@@ -146,7 +151,9 @@ const ForgotPassword: React.FC = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Check your email</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                Check your email
+              </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
                 {modalMessage}
               </p>

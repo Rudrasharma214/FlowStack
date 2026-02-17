@@ -8,7 +8,7 @@ const ResetPassword: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  
+
   const resetPasswordMutation = useResetPasswordMutation();
   const isLoading = resetPasswordMutation.isPending;
 
@@ -53,7 +53,7 @@ const ResetPassword: React.FC = () => {
         token,
         password: passwords.password,
       });
-      
+
       setShowModal(true);
     } catch (err: unknown) {
       logger.error('Reset password failed:', err);
@@ -61,7 +61,10 @@ const ResetPassword: React.FC = () => {
         response?: { data?: { message?: string } };
         message?: string;
       };
-      const errorMessage = errorResponse.response?.data?.message || errorResponse.message || 'Reset failed. Link may be expired.';
+      const errorMessage =
+        errorResponse.response?.data?.message ||
+        errorResponse.message ||
+        'Reset failed. Link may be expired.';
       setErrors({ password: errorMessage });
     }
   };
@@ -73,9 +76,7 @@ const ResetPassword: React.FC = () => {
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-amber-500 dark:text-amber-400 mb-6">Flowstack</h2>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-3">Reset Password</h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Create a new password for your account
-          </p>
+          <p className="text-gray-600 dark:text-gray-400">Create a new password for your account</p>
         </div>
 
         {/* Form */}
@@ -97,7 +98,7 @@ const ResetPassword: React.FC = () => {
               label="New Password"
               placeholder="••••••••"
               value={passwords.password}
-              onChange={(e) => {
+              onChange={e => {
                 setPasswords(prev => ({ ...prev, password: e.target.value }));
                 if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
               }}
@@ -113,9 +114,10 @@ const ResetPassword: React.FC = () => {
               label="Confirm New Password"
               placeholder="••••••••"
               value={passwords.confirmPassword}
-              onChange={(e) => {
+              onChange={e => {
                 setPasswords(prev => ({ ...prev, confirmPassword: e.target.value }));
-                if (errors.confirmPassword) setErrors(prev => ({ ...prev, confirmPassword: undefined }));
+                if (errors.confirmPassword)
+                  setErrors(prev => ({ ...prev, confirmPassword: undefined }));
               }}
               error={errors.confirmPassword}
               required
@@ -130,9 +132,24 @@ const ResetPassword: React.FC = () => {
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Updating Password...
                 </span>
@@ -156,12 +173,20 @@ const ResetPassword: React.FC = () => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Password Reset!</h3>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                Password Reset!
+              </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-                Your password has been successfully updated. You can now log in with your new credentials.
+                Your password has been successfully updated. You can now log in with your new
+                credentials.
               </p>
               <button
                 onClick={() => {

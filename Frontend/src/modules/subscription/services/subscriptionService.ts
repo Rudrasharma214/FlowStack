@@ -1,32 +1,14 @@
-import { apiClient } from '@/services/api/axiosInstance';
-import type { Plan, Subscription } from '../types';
+import { api } from 'services/api/axiosInstance';
+import type { SubscriptionPlan } from '../types/subscriptionService.types';
 
-/**
- * Subscription service
- * Handle all subscription-related API calls
- */
-
-export const subscriptionService = {
-  getPlans: async (): Promise<Plan[]> => {
-    const response = await apiClient.get<Plan[]>('/subscriptions/plans');
+export const SubscriptionService = {
+  subscribe: async (data: SubscriptionPlan) => {
+    const response = await api.post('/subscription', data);
     return response.data;
   },
 
-  getCurrentSubscription: async (): Promise<Subscription | null> => {
-    try {
-      const response = await apiClient.get<Subscription>('/subscriptions/current');
-      return response.data;
-    } catch {
-      return null;
-    }
-  },
-
-  subscribeToPlan: async (planId: string): Promise<Subscription> => {
-    const response = await apiClient.post<Subscription>('/subscriptions', { planId });
+  getMySubscription: async () => {
+    const response = await api.get('/subscription');
     return response.data;
-  },
-
-  cancelSubscription: async (subscriptionId: string): Promise<void> => {
-    await apiClient.delete(`/subscriptions/${subscriptionId}`);
   },
 };

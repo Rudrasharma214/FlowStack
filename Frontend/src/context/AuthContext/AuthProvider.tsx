@@ -42,8 +42,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     [queryClient]
   );
 
-
-
   const logout = useCallback(async () => {
     setError(null);
     try {
@@ -59,8 +57,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       throw err;
     }
   }, [logoutMutation, queryClient]);
-
-
 
   const value: AuthContextType = useMemo(
     () => ({

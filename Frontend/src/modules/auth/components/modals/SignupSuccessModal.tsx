@@ -6,7 +6,11 @@ interface SignupSuccessModalProps {
   onClose: () => void;
 }
 
-export const SignupSuccessModal: React.FC<SignupSuccessModalProps> = ({ isOpen, email, onClose }) => {
+export const SignupSuccessModal: React.FC<SignupSuccessModalProps> = ({
+  isOpen,
+  email,
+  onClose,
+}) => {
   if (!isOpen) return null;
 
   return (
@@ -46,8 +50,8 @@ export const SignupSuccessModal: React.FC<SignupSuccessModalProps> = ({ isOpen, 
 
         {/* Instructions */}
         <p className="text-gray-600 dark:text-gray-400 text-center text-sm mb-8">
-          Please check your email and click on the verification link to activate your account. 
-          Once verified, you can log in to your dashboard.
+          Please check your email and click on the verification link to activate your account. Once
+          verified, you can log in to your dashboard.
         </p>
 
         {/* Action Buttons */}

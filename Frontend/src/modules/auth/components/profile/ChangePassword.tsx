@@ -44,7 +44,7 @@ const ChangePassword: React.FC = () => {
           setMessage({ type: 'success', text: 'Password updated successfully' });
           setPasswords({ oldPassword: '', newPassword: '', confirmPassword: '' });
         },
-        onError: (error) => {
+        onError: error => {
           const appError = handleError(error);
           setMessage({ type: 'error', text: appError.message });
         },
@@ -56,7 +56,9 @@ const ChangePassword: React.FC = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">Security</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Manage your password and account security</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Manage your password and account security
+        </p>
       </div>
 
       <div className="bg-white dark:bg-zinc-900 shadow-sm border border-gray-200 dark:border-zinc-800 rounded-xl overflow-hidden">
@@ -77,7 +79,7 @@ const ChangePassword: React.FC = () => {
             label="Current Password"
             placeholder="••••••••"
             value={passwords.oldPassword}
-            onChange={(e) => setPasswords({ ...passwords, oldPassword: e.target.value })}
+            onChange={e => setPasswords({ ...passwords, oldPassword: e.target.value })}
             fullWidth
             required
             disabled={isPending}
@@ -87,7 +89,7 @@ const ChangePassword: React.FC = () => {
             label="New Password"
             placeholder="••••••••"
             value={passwords.newPassword}
-            onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
+            onChange={e => setPasswords({ ...passwords, newPassword: e.target.value })}
             fullWidth
             required
             disabled={isPending}
@@ -97,7 +99,7 @@ const ChangePassword: React.FC = () => {
             label="Confirm New Password"
             placeholder="••••••••"
             value={passwords.confirmPassword}
-            onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
+            onChange={e => setPasswords({ ...passwords, confirmPassword: e.target.value })}
             fullWidth
             required
             disabled={isPending}
@@ -111,8 +113,19 @@ const ChangePassword: React.FC = () => {
             >
               {isPending && (
                 <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
                 </svg>
               )}
               <span>{isPending ? 'Updating...' : 'Update Password'}</span>

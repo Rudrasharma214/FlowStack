@@ -110,7 +110,7 @@ api.interceptors.response.use(
         if (accessToken) {
           localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
           api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
-          
+
           if (originalRequest.headers) {
             originalRequest.headers.Authorization = `Bearer ${accessToken}`;
           }

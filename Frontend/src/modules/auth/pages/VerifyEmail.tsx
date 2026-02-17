@@ -29,7 +29,7 @@ const VerifyEmail: React.FC = () => {
   };
 
   return (
-      <div className="m-30 flex items-center justify-center bg-transparent ">
+    <div className="m-30 flex items-center justify-center bg-transparent ">
       <div className="w-full max-w-md">
         <div className=" dark:bg-zinc-800 rounded-lg ">
           {/* Header */}
@@ -168,7 +168,8 @@ const VerifyEmail: React.FC = () => {
                   Invalid Link
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
-                  The verification link is missing or invalid. Please check your email and try again.
+                  The verification link is missing or invalid. Please check your email and try
+                  again.
                 </p>
               </div>
 

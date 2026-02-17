@@ -41,7 +41,9 @@ const ProfileInfo: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-b border-gray-100 dark:border-zinc-800 pb-4">
-            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Email Address</div>
+            <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
+              Email Address
+            </div>
             <div className="sm:col-span-2 text-sm text-gray-900 dark:text-white font-medium">
               {user?.email}
             </div>
@@ -59,11 +61,13 @@ const ProfileInfo: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="text-sm font-medium text-gray-500 dark:text-gray-400">Member Since</div>
             <div className="sm:col-span-2 text-sm text-gray-900 dark:text-white">
-              {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              }) : 'N/A'}
+              {user?.createdAt
+                ? new Date(user.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })
+                : 'N/A'}
             </div>
           </div>
         </div>
