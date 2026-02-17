@@ -62,9 +62,10 @@ export class SubscriptionService {
 
             if (!subscription) {
                 return {
-                    success: false,
+                    success: true,
                     message: 'No subscription found for this user',
-                    statusCode: STATUS.NOT_FOUND
+                    statusCode: STATUS.OK,
+                    data: null
                 };
             }
 

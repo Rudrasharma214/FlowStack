@@ -11,6 +11,7 @@ import Profile from '../pages/Profile';
 import ProfileInfo from '../components/profile/ProfileInfo';
 import ChangePassword from '../components/profile/ChangePassword';
 import GeneralSettings from '../components/profile/GeneralSettings';
+import MySubscription from '../components/profile/MySubscription';
 import { ProtectedRoute } from '../../../app/routes/ProtectedRoute';
 
 export const authRoutes: RouteObject[] = [
@@ -41,6 +42,10 @@ export const authRoutes: RouteObject[] = [
       {
         path: 'settings',
         element: <GeneralSettings />,
+      },
+      {
+        path: 'subscription',
+        element: <MySubscription />,
       },
     ],
   },
