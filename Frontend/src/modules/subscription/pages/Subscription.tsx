@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { logger } from '@/services/logger';
 import { useSubscriptionMutation } from '../hooks/useMutationsHooks/useSubscriptionMutation';
+import { usePaymentMutation } from '../hooks/useMutationsHooks/usePaymentMutation';
 import { useActiveGetPlan } from '../hooks/useQueriesHooks/usePlanQueries';
 import { type Plan } from '../types/plan.types';
 
 const Subscription: React.FC = () => {
   const { planId: urlPlanId } = useParams<{ planId: string }>();
-  const mutation = useSubscriptionMutation();
+  const navigate = useNavigate();
+  const subscriptionMutation = useSubscriptionMutation();
+  const paymentMutation = usePaymentMutation();
   const { data: plansData, isLoading: isLoadingPlans } = useActiveGetPlan();
   
   const [selectedPlanId, setSelectedPlanId] = useState<string>(urlPlanId || '');
@@ -20,9 +23,23 @@ const Subscription: React.FC = () => {
     }
   }, [urlPlanId]);
 
-  const handleSubscribe = () => {
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleSubscribe = async () => {
     if (!selectedPlanId) {
-      logger.error('No plan selected');
+      return;
+    }
+
+    const res = await loadRazorpayScript();
+    if (!res) {
       return;
     }
 
@@ -43,13 +60,45 @@ const Subscription: React.FC = () => {
       renewed_at: null,
     };
 
-    mutation.mutate(subscriptionData, {
-      onSuccess: () => {
-        logger.info('Subscription successful!');
-        // Ideally navigate to a success page or dashboard
+    subscriptionMutation.mutate(subscriptionData, {
+      onSuccess: (data) => {
+        const subscriptionId = data.data.id;
+        
+        paymentMutation.mutate(subscriptionId, {
+          onSuccess: (paymentData) => {
+            const { gateway_order_id, amount, currency } = paymentData.data;
+
+            const options = {
+              key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+              amount: amount * 100, // Amount should be in paise
+              currency: currency,
+              name: 'FlowStack',
+              description: 'Plan Subscription',
+              order_id: gateway_order_id,
+              handler: function (response: any) {
+                logger.info('Payment successful', response);
+                navigate('/dashboard');
+              },
+              prefill: {
+                name: '', // Can be prefilled from user context
+                email: '',
+                contact: '',
+              },
+              theme: {
+                color: '#d97706',
+              },
+            };
+
+            const paymentObject = new (window as any).Razorpay(options);
+            paymentObject.open();
+          },
+          onError: (error: any) => {
+            logger.error('Payment initialization failed', error);
+          },
+        });
       },
       onError: (error: any) => {
-        logger.error('Subscription failed', error);
+        logger.error('Subscription creation failed', error);  
       },
     });
   };
@@ -156,16 +205,16 @@ const Subscription: React.FC = () => {
           
           <button
             onClick={handleSubscribe}
-            disabled={mutation.isPending || !selectedPlanId}
+            disabled={subscriptionMutation.isPending || paymentMutation.isPending || !selectedPlanId}
             className="w-full mt-8 py-4 px-8 rounded-lg font-bold text-center transition-colors bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {mutation.isPending ? 'Processing...' : 'Proceed to Payment'}
+            {subscriptionMutation.isPending || paymentMutation.isPending ? 'Processing...' : 'Proceed to Payment'}
           </button>
         </div>
 
-        {mutation.isSuccess && (
-          <p className="mt-4 text-center text-green-600 dark:text-green-400 font-medium italic">
-            Redirecting to dashboard...
+        {(subscriptionMutation.isPending || paymentMutation.isPending) && (
+          <p className="mt-4 text-center text-amber-600 font-medium italic">
+            Initializing secure payment...
           </p>
         )}
       </div>
