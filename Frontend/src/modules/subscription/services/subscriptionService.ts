@@ -1,5 +1,5 @@
 import { api } from 'services/api/axiosInstance';
-import type { SubscriptionPlan } from '../types/subscriptionService.types';
+import type { SubscriptionPlan } from '../types/servicesTypes/subscriptionService.types';
 
 export const SubscriptionService = {
   subscribe: async (data: SubscriptionPlan) => {

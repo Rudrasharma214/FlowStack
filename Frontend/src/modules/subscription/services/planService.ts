@@ -1,7 +1,7 @@
 import { api } from '@/services/api/axiosInstance';
-import type { CreatePlanData, updatePlanData } from '../types/planService.types';
+import type { CreatePlanData, updatePlanData } from '../types/servicesTypes/planService.types';
 
-export const planService = {
+export const PlanService = {
   // For users to view active plans
   getActivePlans: async () => {
     const response = await api.get('/subscription/plans/active');
