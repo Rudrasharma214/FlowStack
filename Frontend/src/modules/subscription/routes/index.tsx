@@ -5,7 +5,7 @@ import { Plans } from '../pages/Plans';
 
 export const subscriptionRoutes: RouteObject[] = [
   {
-    path: '/subscription',
+    path: '/subscription/:planId',
     element: (
       <ProtectedRoute>
         <Subscription />

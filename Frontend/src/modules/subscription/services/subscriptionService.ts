@@ -1,4 +1,4 @@
-import { api } from 'services/api/axiosInstance';
+import { api } from '@/services/api/axiosInstance';
 import type { SubscriptionPlan } from '../types/servicesTypes/subscriptionService.types';
 
 export const SubscriptionService = {

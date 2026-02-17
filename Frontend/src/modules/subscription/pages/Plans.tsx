@@ -1,11 +1,17 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useActiveGetPlan } from '../hooks/useQueriesHooks/usePlanQueries';
 import { PlanCard } from '../components/PlanCard';
 import { type Plan } from '../types/plan.types';
 
 export const Plans: React.FC = () => {
+  const navigate = useNavigate();
   const { data, isLoading, error } = useActiveGetPlan();
   const plans = data?.data;
+
+  const handleSelectPlan = (planId: string | number) => {
+    navigate(`/subscription/${planId}`);
+  };
 
   if (isLoading) {
     return (
@@ -40,7 +46,7 @@ export const Plans: React.FC = () => {
             <PlanCard 
               key={plan.id} 
               plan={plan} 
-              onSelect={(id) => console.log('Selected plan:', id)} 
+              onSelect={handleSelectPlan} 
             />
           ))}
         </div>
