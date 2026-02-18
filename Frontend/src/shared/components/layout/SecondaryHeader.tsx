@@ -6,8 +6,7 @@ export const SecondaryHeader = () => {
 
   const navItems = [
     { label: 'Dashboard', path: '/dashboard' },
-    { label: 'Projects', path: '/dashboard/projects' },
-    { label: 'Subscription', path: '/subscription' },
+    { label: 'Projects', path: '/projects' },
   ];
 
   const isActive = (path: string) => location.pathname === path;

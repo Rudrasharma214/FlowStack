@@ -6,6 +6,7 @@ import { RootRedirect } from './RootRedirect';
 
 import { authRoutes } from '../../modules/auth/routes';
 import { subscriptionRoutes } from '../../modules/subscription/routes';
+import { projectRoutes } from '@/modules/project/routes';
 
 const routes: RouteObject[] = [
   {
@@ -18,6 +19,7 @@ const routes: RouteObject[] = [
       },
       ...authRoutes,
       ...subscriptionRoutes,
+      ...projectRoutes,
       {
         path: '*',
         element: <RootRedirect />,
