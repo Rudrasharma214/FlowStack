@@ -1,8 +1,9 @@
 import { api } from '@/services/api/axiosInstance';
+import type { InviteMemberData } from '../types/serviceTypes/projectMemberService.types';
 
 export const projectMemberService = {
-    inviteMemberToProject: async (projectId: string, userId: string) => {
-        const response = await api.post(`/projects/${projectId}/members/invite`, { userId });
+    inviteMemberToProject: async (projectId: string, inviteData: InviteMemberData) => {
+        const response = await api.post(`/projects/${projectId}/members/invite`, inviteData);
         return response.data;
     },
 
