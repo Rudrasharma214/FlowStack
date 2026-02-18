@@ -1,7 +1,9 @@
 import { Header, SecondaryHeader } from './';
 import { Footer } from './Footer';
+import { Sidebar } from './Sidebar';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext/useAuth';
+import { useSidebar } from '@/shared/hooks/useSidebar';
 
 /**
  * Main layout wrapper component
@@ -10,6 +12,7 @@ import { useAuth } from '@/context/AuthContext/useAuth';
 export const MainLayout = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
+  const sidebar = useSidebar();
 
   if (isLoading && isAuthenticated) {
     return (
@@ -26,17 +29,23 @@ export const MainLayout = () => {
     return (
       <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-zinc-950">
         {/* Main Header - Brand and Actions */}
-        <Header />
+        <Header onMenuToggle={sidebar.toggleMobile} showMenuButton />
 
         {/* Secondary Navigation Header - Page Links */}
-        <SecondaryHeader />
+        {/* <SecondaryHeader /> */}
 
-        {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <Outlet />
-          </div>
-        </main>
+        {/* Body: Sidebar + Content */}
+        <div className="flex flex-1 overflow-hidden">
+          {/* Sidebar */}
+          <Sidebar {...sidebar} />
+
+          {/* Main Content Area */}
+          <main className="flex-1 overflow-y-auto">
+            <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+              <Outlet />
+            </div>
+          </main>
+        </div>
       </div>
     );
   }

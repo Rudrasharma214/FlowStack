@@ -2,7 +2,12 @@ import { useAuth } from '@/context/AuthContext/useAuth';
 import { useTheme } from '@/context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 
-export const Header = () => {
+interface HeaderProps {
+  onMenuToggle?: () => void;
+  showMenuButton?: boolean;
+}
+
+export const Header = ({ onMenuToggle, showMenuButton }: HeaderProps) => {
   const { user, logout, isAuthenticated } = useAuth();
   const { mode, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -22,6 +27,19 @@ export const Header = () => {
         <div className={`flex justify-between items-center h-16`}>
           {/* Logo Section */}
           <div className="flex items-center space-x-4">
+            {/* Hamburger menu - mobile only */}
+            {showMenuButton && (
+              <button
+                onClick={onMenuToggle}
+                className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-600 dark:text-gray-300 transition"
+                aria-label="Open navigation menu"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+            )}
+
             <div className="shrink-0">
               <button
                 onClick={() => navigate(isAuthenticated ? '/dashboard' : '/')}

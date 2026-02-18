@@ -7,3 +7,4 @@ export { Header } from './Header';
 export { Footer } from './Footer';
 export { SecondaryHeader } from './SecondaryHeader';
 export { MainLayout } from './MainLayout';
+export { Sidebar } from './Sidebar';
