@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useGetProjectsQuery } from '../hooks/useQueriesHooks/useProjectQueries';
 import {
     PROJECT_STATUS_LABELS,
@@ -11,12 +12,12 @@ import DeleteButton from './DeleteButton';
 
 interface ProjectListProps {
     onCreateClick: () => void;
-    onProjectClick?: (project: Project) => void;
 }
 
-const ProjectList = ({ onCreateClick, onProjectClick }: ProjectListProps) => {
+const ProjectList = ({ onCreateClick }: ProjectListProps) => {
     const { data: projects, isLoading, isError, error } = useGetProjectsQuery();
     const [editingProject, setEditingProject] = useState<Project | null>(null);
+    const navigate = useNavigate();
 
     if (isLoading) {
         return (
@@ -96,7 +97,7 @@ const ProjectList = ({ onCreateClick, onProjectClick }: ProjectListProps) => {
                         return (
                             <div
                                 key={project.id}
-                                onClick={() => onProjectClick?.(project)}
+                                onClick={() => navigate(`/projects/${project.id}`)}
                                 className="px-5 py-4 hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors cursor-pointer"
                             >
                                 <div className="flex items-center justify-between mb-2">
@@ -112,7 +113,7 @@ const ProjectList = ({ onCreateClick, onProjectClick }: ProjectListProps) => {
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <span className="text-xs text-gray-400 dark:text-gray-500">
-                                            {new Date(project.createdAt).toLocaleDateString()}
+                                            {new Date(project.createdAt ?? project.created_at ?? '').toLocaleDateString()}
                                         </span>
                                         <EditButton
                                             project={project}

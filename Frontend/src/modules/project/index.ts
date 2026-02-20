@@ -1,5 +1,6 @@
 // Pages
 export { default as ProjectDashboard } from './pages/ProjectDashboard';
+export { default as ProjectDetail } from './pages/ProjectDetail';
 
 // Components
 export { default as ProjectList } from './components/ProjectList';

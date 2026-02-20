@@ -7,8 +7,11 @@ export interface Project {
     end_date?: string;
     completed_at?: string;
     created_by: number;
-    createdAt: string;
-    updatedAt: string;
+    // Sequelize may return either camelCase or snake_case depending on the endpoint
+    createdAt?: string;
+    updatedAt?: string;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export type ProjectStatus = Project['status'];

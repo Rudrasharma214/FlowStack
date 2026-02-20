@@ -2,9 +2,7 @@ import { useState, useMemo } from 'react';
 import { useGetProjectsQuery } from '../hooks/useQueriesHooks/useProjectQueries';
 import ProjectList from '../components/ProjectList';
 import CreateProjectModal from '../components/CreateProjectModal';
-import type { Project } from '../types/project.types';
-
-const ProjectDashboard = () => {
+import type { Project } from '../types/project.types';const ProjectDashboard = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const { data } = useGetProjectsQuery();
 
@@ -23,10 +21,6 @@ const ProjectDashboard = () => {
       { label: 'In Progress', value: inProgress, color: 'text-indigo-600 dark:text-indigo-400', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
     ];
   }, [data]);
-
-  const handleProjectClick = (project: Project) => {
-    console.log('Navigate to project:', project.id);
-  };
 
   return (
     <div className="space-y-6">
@@ -51,7 +45,6 @@ const ProjectDashboard = () => {
       {/* Project List */}
       <ProjectList
         onCreateClick={() => setIsCreateModalOpen(true)}
-        onProjectClick={handleProjectClick}
       />
 
       {/* Create Project Modal */}
