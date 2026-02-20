@@ -11,6 +11,7 @@ export class ProjectMemberController {
         this.verifyInvitation = this.verifyInvitation.bind(this);
         this.acceptInvitation = this.acceptInvitation.bind(this);
         this.rejectInvitation = this.rejectInvitation.bind(this);
+        this.getProjectMembers = this.getProjectMembers.bind(this);
     }
 
     /* Invite an member */

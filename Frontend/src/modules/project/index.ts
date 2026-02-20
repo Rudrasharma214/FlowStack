@@ -6,6 +6,7 @@ export { default as ProjectDetail } from './pages/ProjectDetail';
 export { default as ProjectList } from './components/ProjectList';
 export { default as CreateProjectModal } from './components/CreateProjectModal';
 export { default as EditProjectModal } from './components/EditProjectModal';
+export { default as ProjectMembers } from './components/ProjectMembers';
 
 // Hooks – Queries
 export { useGetProjectsQuery, useGetProjectByIdQuery } from './hooks/useQueriesHooks/useProjectQueries';

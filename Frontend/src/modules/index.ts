@@ -4,5 +4,4 @@
  */
 
 export * as authModule from './auth';
-export * as dashboardModule from './dashboard';
 export * as subscriptionModule from './subscription';

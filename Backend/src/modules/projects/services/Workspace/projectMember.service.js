@@ -1,8 +1,10 @@
 import { sequelize } from '../../../../config/db.js';
+import { Op } from 'sequelize';
 import { STATUS } from '../../../../core/constants/statusCodes.js';
 import projectNames from '../../../../core/events/eventNames/projectNames.js';
 import { publishEvent } from '../../../../core/events/eventPublisher.js';
 import { UserRepository } from '../../../../core/modules/auth/repositories/user.repositories.js';
+import User from '../../../../core/modules/auth/models/user.model.js';
 import { ProjectRepository } from '../../repositories/Workspace/project.repositories.js';
 import { ProjectInvitationRepository } from '../../repositories/Workspace/projectInvitation.repositories.js';
 import { ProjectMemberRepository } from '../../repositories/Workspace/projectMember.repositories.js';
@@ -36,18 +38,18 @@ export class ProjectMemberService {
             }
 
             const existingInvitation =
-        await projectInvitationRepository.findInvitationByEmailAndProjectId(
-            email,
-            projectId,
-            transaction
-        );
+                await projectInvitationRepository.findInvitationByEmailAndProjectId(
+                    email,
+                    projectId,
+                    transaction
+                );
 
             if (existingInvitation) {
                 await transaction.rollback();
                 return {
                     success: false,
                     message:
-            'An invitation has already been sent to this email for the project',
+                        'An invitation has already been sent to this email for the project',
                     statusCode: STATUS.BAD_REQUEST
                 };
             }
@@ -72,10 +74,10 @@ export class ProjectMemberService {
                 name
             };
             const invitation =
-        await projectInvitationRepository.createProjectInvitation(
-            data,
-            transaction
-        );
+                await projectInvitationRepository.createProjectInvitation(
+                    data,
+                    transaction
+                );
 
             await transaction.commit();
 
@@ -110,15 +112,15 @@ export class ProjectMemberService {
             const isToken = await verifyInviteToken(token);
 
             const invitation =
-        await projectInvitationRepository.findInvitationByEmailAndProjectId(
-            isToken.email,
-            isToken.projectId
-        );
+                await projectInvitationRepository.findInvitationByEmailAndProjectId(
+                    isToken.email,
+                    isToken.projectId
+                );
             if (
                 !invitation ||
-        invitation.token !== token ||
-        invitation.status !== 'pending' ||
-        new Date() > invitation.expires_at
+                invitation.token !== token ||
+                invitation.status !== 'pending' ||
+                new Date() > invitation.expires_at
             ) {
                 return {
                     success: false,
@@ -166,16 +168,16 @@ export class ProjectMemberService {
         try {
             const isToken = await verifyInviteToken(token);
             const invitation =
-        await projectInvitationRepository.findInvitationByEmailAndProjectId(
-            isToken.email,
-            isToken.projectId,
-            transaction
-        );
+                await projectInvitationRepository.findInvitationByEmailAndProjectId(
+                    isToken.email,
+                    isToken.projectId,
+                    transaction
+                );
             if (
                 !invitation ||
-        invitation.token !== token ||
-        invitation.status !== 'pending' ||
-        new Date() > invitation.expires_at
+                invitation.token !== token ||
+                invitation.status !== 'pending' ||
+                new Date() > invitation.expires_at
             ) {
                 await transaction.rollback();
                 return {
@@ -238,16 +240,16 @@ export class ProjectMemberService {
         try {
             const isToken = await verifyInviteToken(token);
             const invitation =
-        await projectInvitationRepository.findInvitationByEmailAndProjectId(
-            isToken.email,
-            isToken.projectId,
-            transaction
-        );
+                await projectInvitationRepository.findInvitationByEmailAndProjectId(
+                    isToken.email,
+                    isToken.projectId,
+                    transaction
+                );
             if (
                 !invitation ||
-        invitation.token !== token ||
-        invitation.status !== 'pending' ||
-        new Date() > invitation.expires_at
+                invitation.token !== token ||
+                invitation.status !== 'pending' ||
+                new Date() > invitation.expires_at
             ) {
                 await transaction.rollback();
                 return {
@@ -292,28 +294,37 @@ export class ProjectMemberService {
             };
 
             if (search) {
-                whereClause['$User.name$'] = { [sequelize.Op.iLike]: `%${search}%` };
+                whereClause['$user.name$'] = { [Op.like]: `%${search}%` };
             }
 
             const members =
-        await projectMemberRepository.getProjectMembersByProjectId({
-            whereClause,
-            options: { offset, limit },
-            include: [
-                {
-                    model: userRepository.model,
-                    as: 'User',
-                    attributes: ['id', 'name', 'email']
-                }
-            ],
-            transaction: null
-        });
+                await projectMemberRepository.getProjectMembersByProjectId({
+                    whereClause,
+                    options: { offset, limit },
+                    include: [
+                        {
+                            model: User,
+                            as: 'user',
+                            attributes: ['id', 'name', 'email']
+                        }
+                    ],
+                    transaction: null
+                });
 
             if (!members || members.count === 0) {
                 return {
-                    success: false,
+                    success: true,
                     message: 'No members found for the project',
-                    statusCode: STATUS.NOT_FOUND
+                    statusCode: STATUS.NOT_FOUND,
+                    data: {
+                        members: [],
+                        pagination: {
+                            total: 0, 
+                            page, 
+                            limit, 
+                            totalPages: 0
+                        }
+                    }
                 };
             }
 

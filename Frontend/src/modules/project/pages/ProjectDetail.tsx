@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetProjectByIdQuery } from '../hooks/useQueriesHooks/useProjectQueries';
 import { PROJECT_STATUS_COLORS, PROJECT_STATUS_LABELS, type Project } from '../types/project.types';
+import ProjectMembers from '../components/ProjectMembers';
 
 const ProjectDetail = () => {
     const { projectId } = useParams<{ projectId: string }>();
@@ -97,6 +98,9 @@ const ProjectDetail = () => {
                     <MetaItem label="Last Updated" value={updatedDate} />
                 </div>
             </div>
+
+            {/* Members */}
+            <ProjectMembers projectId={projectId ?? ''} />
         </div>
     );
 };
