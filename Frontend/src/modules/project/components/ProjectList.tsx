@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import { useGetProjectsQuery } from '../hooks/useQueriesHooks/useProjectQueries';
-import { useDeleteProjectMutation } from '../hooks/useMutationHooks/useProjectMutation';
 import {
     PROJECT_STATUS_LABELS,
     PROJECT_STATUS_COLORS,
     type Project,
 } from '../types/project.types';
-import { useQueryClient } from '@tanstack/react-query';
+import EditProjectModal from './EditProjectModal';
+import EditButton from './EditButton';
+import DeleteButton from './DeleteButton';
 
 interface ProjectListProps {
     onCreateClick: () => void;
@@ -14,6 +16,7 @@ interface ProjectListProps {
 
 const ProjectList = ({ onCreateClick, onProjectClick }: ProjectListProps) => {
     const { data: projects, isLoading, isError, error } = useGetProjectsQuery();
+    const [editingProject, setEditingProject] = useState<Project | null>(null);
 
     if (isLoading) {
         return (
@@ -58,6 +61,7 @@ const ProjectList = ({ onCreateClick, onProjectClick }: ProjectListProps) => {
     const projectList: Project[] = (projects as { projects: Project[] })?.projects ?? [];
 
     return (
+        <>
         <div className="bg-white dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-800">
             <div className="px-5 py-4 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -110,6 +114,10 @@ const ProjectList = ({ onCreateClick, onProjectClick }: ProjectListProps) => {
                                         <span className="text-xs text-gray-400 dark:text-gray-500">
                                             {new Date(project.createdAt).toLocaleDateString()}
                                         </span>
+                                        <EditButton
+                                            project={project}
+                                            onEdit={setEditingProject}
+                                        />
                                         <DeleteButton
                                             projectId={project.id}
                                         />
@@ -126,42 +134,12 @@ const ProjectList = ({ onCreateClick, onProjectClick }: ProjectListProps) => {
                 </div>
             )}
         </div>
-    );
-};
 
-/** Isolated delete button so each row gets its own mutation instance */
-const DeleteButton = ({ projectId }: { projectId: string }) => {
-    const queryClient = useQueryClient();
-    const deleteMutation = useDeleteProjectMutation(projectId);
-
-    const handleClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (!window.confirm('Are you sure you want to delete this project?')) return;
-        deleteMutation.mutate(undefined, {
-            onSuccess: () => {
-                queryClient.invalidateQueries({ queryKey: ['projects'] });
-            },
-        });
-    };
-
-    return (
-        <button
-            onClick={handleClick}
-            disabled={deleteMutation.isPending}
-            className="text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors disabled:opacity-50"
-            title="Delete project"
-        >
-            {deleteMutation.isPending ? (
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-            ) : (
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-            )}
-        </button>
+        <EditProjectModal
+            project={editingProject}
+            onClose={() => setEditingProject(null)}
+        />
+        </>
     );
 };
 

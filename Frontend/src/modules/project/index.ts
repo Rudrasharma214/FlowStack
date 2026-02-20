@@ -4,6 +4,7 @@ export { default as ProjectDashboard } from './pages/ProjectDashboard';
 // Components
 export { default as ProjectList } from './components/ProjectList';
 export { default as CreateProjectModal } from './components/CreateProjectModal';
+export { default as EditProjectModal } from './components/EditProjectModal';
 
 // Hooks – Queries
 export { useGetProjectsQuery, useGetProjectByIdQuery } from './hooks/useQueriesHooks/useProjectQueries';

@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { projectService } from "../../services/projectService";
-import type { CreateProjectData } from "../../types/serviceTypes/projectService.types";
+import type { CreateProjectData, UpdateProjectData } from "../../types/serviceTypes/projectService.types";
 
 
 export const useProjectMutation = () => {
@@ -16,7 +16,7 @@ export const useProjectMutation = () => {
 export const useUpdateProjectMutation = (projectId: string) => {
     return useMutation({
         mutationKey: ['updateProject', projectId],
-        mutationFn: async (projectData: CreateProjectData) => {
+        mutationFn: async (projectData: UpdateProjectData) => {
             const response = await projectService.updateProject(projectId, projectData);
             return response;
         }
