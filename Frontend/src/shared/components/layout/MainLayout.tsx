@@ -1,4 +1,4 @@
-import { Header, SecondaryHeader } from './';
+import { Header } from './';
 import { Footer } from './Footer';
 import { Sidebar } from './Sidebar';
 import { Outlet, useLocation } from 'react-router-dom';
