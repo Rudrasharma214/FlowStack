@@ -1,14 +1,31 @@
 import { Op } from 'sequelize';
+import { sequelize } from '../../../../config/db.js';
 import { STATUS } from '../../../../core/constants/statusCodes.js';
 import { ProjectRepository } from '../../repositories/Workspace/project.repositories.js';
+import { ProjectMemberRepository } from '../../repositories/Workspace/projectMember.repositories.js';
 
 const projectRepository = new ProjectRepository();
+const projectMemberRepository = new ProjectMemberRepository();
 
 export class ProjectService {
     /* Create a new project */
     async createProject(projectData) {
+        const transaction = await sequelize.transaction();
         try {
-            const createdProject = await projectRepository.createProject(projectData);
+            const createdProject = await projectRepository.createProject(projectData, transaction);
+
+            // Automatically add the creator as the project owner
+            await projectMemberRepository.createProjectMember(
+                {
+                    project_id: createdProject.id,
+                    user_id: projectData.created_by,
+                    role: 'owner',
+                    added_by: projectData.created_by
+                },
+                transaction
+            );
+
+            await transaction.commit();
 
             return {
                 success: true,
@@ -17,6 +34,7 @@ export class ProjectService {
                 statusCode: STATUS.CREATED
             };
         } catch (error) {
+            await transaction.rollback();
             return {
                 success: false,
                 message: 'An error occurred while creating the project',
